@@ -79,7 +79,7 @@ const Contract_Module = await import(pathToFileURL(contractPath).href);
 const compiledContract = CompiledContract.make('anonymous-membership-organisation', Contract_Module.Contract).pipe(
   CompiledContract.withWitnesses({
     credential: (context: any) => [context.privateState, { secret: new Uint8Array(32), membershipId: 0n }]
-  } as any),
+  } as unknown as never),
   CompiledContract.withCompiledFileAssets(zkConfigPath),
 );
 
