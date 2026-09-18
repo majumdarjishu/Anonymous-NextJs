@@ -187,6 +187,12 @@ anonymous-membership-organisation/
 └── README.md                # Primary documentation & user guide
 ```
 
+## 🎨 UI Redesign (SaaS Theme)
+This project features a fully modernized, light SaaS aesthetic:
+- **Clean Interface**: Replaced legacy dark modes with a crisp `bg-slate-50` and high-contrast typography.
+- **Glassmorphism**: Elegant frosted glass panels (`backdrop-blur-md`, `bg-white/80`) used across all dashboard cards and modules.
+- **Brand Accents**: Vibrant orange accents (`text-orange-600`, `bg-orange-500`) used for primary actions to provide a welcoming user experience.
+
 ## 📄 License
 This project is open-source and distributed under the MIT License.
 # Anonymous-NextJs
