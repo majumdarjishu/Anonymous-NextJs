@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useMidnight } from '@/context/MidnightContext';
 import { useState } from 'react';
 import { Shield, Menu, X, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
@@ -30,41 +31,30 @@ export function Navbar() {
     : null;
 
   return (
-    <nav style={{
-      position: 'sticky', top: 0, zIndex: 100,
-      borderBottom: '1px solid var(--border)',
-      background: 'rgba(255,255,255,0.85)',
-      backdropFilter: 'blur(16px)',
-    }}>
-      <div className="page-container" style={{ display: 'flex', alignItems: 'center', height: 64, gap: 32 }}>
+    <nav className="sticky top-0 z-50 backdrop-blur-xl bg-bg-color/70 border-b border-black/5">
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-8">
+        
         {/* Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <div style={{
-            width: 34, height: 34, borderRadius: 10,
-            background: 'linear-gradient(135deg, #7c5cfc, #60a5fa)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Shield size={18} color="#fff" />
+        <Link href="/" className="flex items-center gap-3 text-main font-bold text-xl group">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-amber-500 flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg shadow-brand-500/20">
+            <Shield size={20} className="text-white" />
           </div>
-          <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-primary)' }}>
-            AnonOrg
-          </span>
+          <span className="tracking-tight">AnonOrg</span>
         </Link>
 
         {/* Desktop Nav */}
-        <div style={{ display: 'flex', gap: 4, flex: 1 }} className="desktop-nav">
+        <div className="hidden md:flex items-center gap-2 flex-1">
           {NAV_LINKS.map(link => {
             const active = pathname === link.href;
             return (
-              <Link key={link.href} href={link.href} style={{
-                padding: '6px 14px', borderRadius: 8, fontSize: 14, fontWeight: 500,
-                textDecoration: 'none',
-                color: active ? 'var(--accent)' : 'var(--text-secondary)',
-                background: active ? 'var(--accent-dim)' : 'transparent',
-                transition: 'all 0.15s',
-              }}
-                onMouseEnter={e => { if (!active) (e.target as HTMLElement).style.color = 'var(--text-primary)'; }}
-                onMouseLeave={e => { if (!active) (e.target as HTMLElement).style.color = 'var(--text-secondary)'; }}
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  active 
+                    ? 'bg-brand-500/10 text-brand-400' 
+                    : 'text-muted hover:text-main hover:bg-black/5'
+                }`}
               >
                 {link.label}
               </Link>
@@ -73,106 +63,121 @@ export function Navbar() {
         </div>
 
         {/* Wallet Button */}
-        <div style={{ position: 'relative', flexShrink: 0 }}>
+        <div className="relative flex-shrink-0">
           {status === 'connected' ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:block text-right">
+                <div className="text-[10px] text-muted font-bold uppercase tracking-wider">
                   {walletName}
                 </div>
-                <div style={{ fontSize: 13, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace' }}>
+                <div className="text-sm font-mono text-brand-100">
                   {shortAddr}
                 </div>
               </div>
-              <div className="badge badge-green">
-                <span className="dot-pulse dot-green" />
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse" />
                 Connected
               </div>
-              <button className="btn btn-ghost btn-sm" onClick={disconnectWallet}>
+              <button 
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                onClick={disconnectWallet}
+              >
                 Disconnect
               </button>
             </div>
           ) : (
             <>
               <button
-                className="btn btn-primary btn-sm"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-semibold transition-all disabled:opacity-50"
                 onClick={handleConnectClick}
                 disabled={status === 'connecting'}
               >
                 {status === 'connecting' ? (
-                  <><span className="spinner" /> Connecting…</>
+                  <><Loader2 size={16} className="animate-spin" /> Connecting…</>
                 ) : 'Connect Wallet'}
               </button>
-              {status === 'error' && connectionError && (
-                <div style={{
-                  position: 'absolute', top: '100%', right: 0, marginTop: 8,
-                  background: 'var(--bg-card)', border: '1px solid rgba(239,68,68,0.3)',
-                  borderRadius: 10, padding: '12px 16px', minWidth: 280, zIndex: 200,
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-                }}>
-                  <div style={{ fontSize: 12, color: 'var(--red)', fontWeight: 600, marginBottom: 4 }}>
-                    ⚠ Connection Failed
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                    {connectionError}
-                  </div>
-                </div>
-              )}
+              
+              <AnimatePresence>
+                {status === 'error' && connectionError && showError && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full right-0 mt-4 p-4 min-w-[280px] rounded-xl glass-panel bg-bg-color/90 border-red-500/30 shadow-2xl z-50"
+                  >
+                    <div className="text-red-400 font-bold text-sm mb-1">
+                      ⚠ Connection Failed
+                    </div>
+                    <div className="text-sm text-muted">
+                      {connectionError}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </>
           )}
         </div>
 
         {/* Mobile hamburger */}
         <button
-          className="btn btn-ghost btn-sm mobile-menu-btn"
-          onClick={() => setMobileOpen(o => !o)}
-          style={{ display: 'none' }}
+          className="md:hidden p-2 rounded-lg text-muted hover:text-main hover:bg-black/5 transition-colors"
+          onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Toggle menu"
         >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
-      {mobileOpen && (
-        <div style={{
-          borderTop: '1px solid var(--border)',
-          background: 'rgba(255,255,255,0.95)',
-          padding: '16px 24px',
-        }}>
-          {NAV_LINKS.map(link => (
-            <Link key={link.href} href={link.href}
-              onClick={() => setMobileOpen(false)}
-              style={{
-                display: 'block', padding: '10px 0', fontSize: 15,
-                color: pathname === link.href ? 'var(--accent)' : 'var(--text-secondary)',
-                textDecoration: 'none', fontWeight: 500,
-                borderBottom: '1px solid var(--border)',
-              }}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <div style={{ marginTop: 16 }}>
-            {status === 'connected' ? (
-              <button className="btn btn-danger btn-sm" onClick={disconnectWallet}>
-                Disconnect
-              </button>
-            ) : (
-              <button className="btn btn-primary" onClick={handleConnectClick} disabled={status === 'connecting'} style={{ width: '100%' }}>
-                {status === 'connecting' ? 'Connecting…' : 'Connect Wallet'}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .mobile-menu-btn { display: flex !important; }
-        }
-      `}</style>
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="md:hidden overflow-hidden bg-bg-color/95 backdrop-blur-xl border-t border-black/5"
+          >
+            <div className="px-6 py-4 space-y-2">
+              {NAV_LINKS.map(link => {
+                const active = pathname === link.href;
+                return (
+                  <Link 
+                    key={link.href} 
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${
+                      active 
+                        ? 'bg-brand-500/10 text-brand-400' 
+                        : 'text-muted hover:text-main hover:bg-black/5'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+              
+              <div className="pt-4 mt-4 border-t border-black/10">
+                {status === 'connected' ? (
+                  <button 
+                    className="w-full py-3 rounded-xl bg-red-500/10 text-red-400 font-semibold"
+                    onClick={() => { disconnectWallet(); setMobileOpen(false); }}
+                  >
+                    Disconnect
+                  </button>
+                ) : (
+                  <button 
+                    className="w-full py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-semibold"
+                    onClick={handleConnectClick} 
+                    disabled={status === 'connecting'}
+                  >
+                    {status === 'connecting' ? 'Connecting…' : 'Connect Wallet'}
+                  </button>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

@@ -20,8 +20,8 @@ export default function AdminPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
         <Lock className="w-16 h-16 text-slate-500 mb-6" />
-        <h2 className="text-2xl font-bold text-white mb-2">Admin Access Restricted</h2>
-        <p className="text-slate-400 max-w-md">Connect with an administrator wallet to manage eligible patients.</p>
+        <h2 className="text-2xl font-bold text-slate-900 mb-2">Admin Access Restricted</h2>
+        <p className="text-slate-600 max-w-md">Connect with an administrator wallet to manage eligible patients.</p>
       </div>
     );
   }
@@ -95,22 +95,22 @@ export default function AdminPage() {
           <Shield className="w-6 h-6 text-white" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-white">Administrator Console</h1>
-          <p className="text-slate-400 mt-1">Manage network participants and eligible patient commitments</p>
+          <h1 className="text-3xl font-bold text-slate-900">Administrator Console</h1>
+          <p className="text-slate-600 mt-1">Manage network participants and eligible patient commitments</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-panel p-6">
-            <h2 className="text-lg font-bold text-white mb-4 flex items-center">
-              <UserPlus className="w-5 h-5 text-indigo-400 mr-2" />
+            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center">
+              <UserPlus className="w-5 h-5 text-indigo-500 mr-2" />
               Add Eligible Patient Commitment
             </h2>
             
             <form onSubmit={handleAddPatient} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-300 mb-2">Patient Commitment Hash (Hex)</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Patient Commitment Hash (Hex)</label>
                 <input 
                   type="text" 
                   placeholder="e.g. 0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" 
@@ -127,7 +127,7 @@ export default function AdminPage() {
               <button 
                 type="submit" 
                 disabled={!commitmentInput || isSubmitting || !contractAddress}
-                className="w-full relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-medium px-4 py-3 transition-all duration-300 disabled:opacity-50"
+                className="w-full relative overflow-hidden bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white rounded-xl font-medium px-4 py-3 transition-all duration-300 disabled:opacity-50"
               >
                 {isSubmitting ? 'Submitting to Network...' : 'Add Patient to Network'}
               </button>
@@ -158,7 +158,7 @@ export default function AdminPage() {
         <div className="space-y-6">
           {/* Contract Deployment Panel */}
           <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="glass-panel p-6">
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Contract Deployment</h3>
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Contract Deployment</h3>
             <div className="space-y-4">
               {contractAddress ? (
                 <div>
@@ -167,11 +167,11 @@ export default function AdminPage() {
                     <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
                     Deployed &amp; Active
                   </div>
-                  <div className="bg-black/30 rounded-lg p-2 flex items-start gap-2">
-                    <p className="text-xs font-mono text-slate-400 break-all flex-1">{contractAddress}</p>
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 flex items-start gap-2">
+                    <p className="text-xs font-mono text-slate-600 break-all flex-1">{contractAddress}</p>
                     <button
                       onClick={() => handleCopyAddress(contractAddress)}
-                      className="flex-shrink-0 text-slate-400 hover:text-white transition-colors"
+                      className="flex-shrink-0 text-slate-400 hover:text-slate-900 transition-colors"
                       title="Copy address"
                     >
                       {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -180,7 +180,7 @@ export default function AdminPage() {
                 </div>
               ) : (
                 <div>
-                  <p className="text-xs text-slate-400 mb-4">
+                  <p className="text-xs text-slate-600 mb-4">
                     The Smart Contract is not connected. Deploy it via your wallet, or paste an existing address below.
                   </p>
                   <button 
@@ -197,14 +197,14 @@ export default function AdminPage() {
                       {deployResult.status === 'success' ? (
                         <>
                           <p className="font-bold mb-1">Deployment Successful!</p>
-                          <div className="bg-black/30 rounded p-2 flex items-start gap-2 mb-2">
-                            <p className="font-mono text-xs break-all flex-1">{deployResult.address}</p>
+                          <div className="bg-emerald-50 border border-emerald-200 rounded p-2 flex items-start gap-2 mb-2">
+                            <p className="font-mono text-xs text-emerald-800 break-all flex-1">{deployResult.address}</p>
                             <button onClick={() => handleCopyAddress(deployResult.address!)} className="flex-shrink-0">
-                              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-emerald-600" />}
                             </button>
                           </div>
-                          <p className="text-xs text-slate-300">
-                            Address saved to your browser. Set <code className="bg-black/30 px-1 rounded">NEXT_PUBLIC_CONTRACT_ADDRESS</code> in Vercel env vars for persistence.
+                          <p className="text-xs text-emerald-700">
+                            Address saved to your browser. Set <code className="bg-emerald-500/10 px-1 rounded">NEXT_PUBLIC_CONTRACT_ADDRESS</code> in Vercel env vars for persistence.
                           </p>
                         </>
                       ) : (
@@ -219,10 +219,10 @@ export default function AdminPage() {
               )}
 
               {/* Manual address entry — always visible */}
-              <div className="border-t border-slate-700/50 pt-4">
+              <div className="border-t border-slate-200 pt-4">
                 <button
                   onClick={() => setShowManualInput(v => !v)}
-                  className="text-xs text-slate-400 hover:text-slate-300 flex items-center gap-1 transition-colors"
+                  className="text-xs text-slate-500 hover:text-brand-500 flex items-center gap-1 transition-colors"
                 >
                   <Settings className="w-3 h-3" />
                   {showManualInput ? 'Cancel' : 'Set address manually'}
@@ -234,12 +234,12 @@ export default function AdminPage() {
                       placeholder="Paste contract address…"
                       value={manualAddress}
                       onChange={e => setManualAddress(e.target.value)}
-                      className="input-field text-xs font-mono"
+                      className="input-field text-xs font-mono bg-white border border-slate-200 focus:border-brand-400 text-slate-900"
                     />
                     <button
                       onClick={handleSetManualAddress}
                       disabled={!manualAddress.trim()}
-                      className="w-full py-2 text-xs rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium disabled:opacity-50 transition-colors"
+                      className="w-full py-2 text-xs rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-medium disabled:opacity-50 transition-colors"
                     >
                       Apply Address
                     </button>
@@ -251,11 +251,11 @@ export default function AdminPage() {
 
           {/* Admin Status Panel */}
           <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="glass-panel p-6">
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Admin Status</h3>
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Admin Status</h3>
             <div className="space-y-4">
               <div>
                 <p className="text-xs text-slate-500 mb-1">Current Wallet</p>
-                <p className="text-sm font-mono text-white truncate">{walletAddress}</p>
+                <p className="text-sm font-mono text-slate-900 truncate">{walletAddress}</p>
               </div>
               <div>
                 <p className="text-xs text-slate-500 mb-1">Contract Connection</p>

@@ -45,7 +45,7 @@ export default function OrganizationPage() {
             </div>
             <p className="text-3xl font-bold text-slate-900">12</p>
           </div>
-          <p className="text-xs text-slate-400 mt-4">Verified by Midnight Zero-Knowledge Proofs</p>
+          <p className="text-xs text-slate-500 mt-4">Verified by Midnight Zero-Knowledge Proofs</p>
         </div>
 
         <div className="glass-panel p-6 border-l-4 border-l-primary-500 flex flex-col justify-between">
@@ -56,7 +56,7 @@ export default function OrganizationPage() {
             </div>
             <p className="text-lg font-bold text-slate-900 break-all">{contractAddress || 'Not Deployed'}</p>
           </div>
-          <p className="text-xs text-slate-400 mt-4">Active and accepting anonymous proofs</p>
+          <p className="text-xs text-slate-500 mt-4">Active and accepting anonymous proofs</p>
         </div>
       </div>
 

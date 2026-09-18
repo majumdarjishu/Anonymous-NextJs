@@ -219,7 +219,7 @@ export const createMidnightProviders = async (
     privateStateProvider: levelPrivateStateProvider({
       privateStateStoreName: 'anonymous-membership-organisation-state',
       accountId: addressString,
-      privateStoragePasswordProvider: () => 'local-development-password-1',
+      privateStoragePasswordProvider: () => 'Local-development-password-1!',
     }),
     publicDataProvider: indexerPublicDataProvider(networkConfig.indexer, networkConfig.indexerWS),
     zkConfigProvider,

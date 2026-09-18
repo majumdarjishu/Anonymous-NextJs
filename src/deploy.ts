@@ -19,6 +19,7 @@ import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-p
 import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
 import { NodeZkConfigProvider } from '@midnight-ntwrk/midnight-js-node-zk-config-provider';
 import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
+import { fromHex } from '@midnight-ntwrk/midnight-js-utils';
 
 // @ts-expect-error Required for wallet sync
 globalThis.WebSocket = WebSocket;
@@ -76,7 +77,9 @@ if (!fs.existsSync(contractPath)) {
 const Contract_Module = await import(pathToFileURL(contractPath).href);
 
 const compiledContract = CompiledContract.make('anonymous-membership-organisation', Contract_Module.Contract).pipe(
-  CompiledContract.withVacantWitnesses,
+  CompiledContract.withWitnesses({
+    credential: (context) => [context.privateState, { secret: new Uint8Array(32), membershipId: 0n }]
+  }),
   CompiledContract.withCompiledFileAssets(zkConfigPath),
 );
 
@@ -86,7 +89,7 @@ async function createProviders(walletCtx: WalletContext) {
   // The SDK requires the private-state password to be at least 16 characters.
   // The default below is for local devnet only — set a strong
   // password via environment variables for preprod or mainnet.
-  const privateStatePassword = process.env.PRIVATE_STATE_PASSWORD?.trim() || 'local-development-password';
+  const privateStatePassword = process.env.PRIVATE_STATE_PASSWORD?.trim() || 'Local-development-password-1!';
 
   const walletProvider = {
     // In Midnight.js 4.1.x the WalletProvider interface returns the key objects
@@ -290,7 +293,7 @@ async function main() {
       // conditional args type widens to any[] and an explicit [] is required.)
       deployed = await deployContract(providers, {
         compiledContract: compiledContract as any,
-        args: [walletCtx.shieldedSecretKeys.coinPublicKey],
+        args: [typeof walletCtx.shieldedSecretKeys.coinPublicKey === 'string' ? fromHex(walletCtx.shieldedSecretKeys.coinPublicKey) : walletCtx.shieldedSecretKeys.coinPublicKey],
         privateStateId: PRIVATE_STATE_ID,
         initialPrivateState: {},
       });

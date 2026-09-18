@@ -3,7 +3,7 @@
 import { useMidnight } from '@/context/MidnightContext';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Wallet, Shield, Activity, Key, ArrowRight, Server, Loader2 } from 'lucide-react';
+import { Wallet, Shield, Activity, Key, ArrowRight, Server, Loader2, Check } from 'lucide-react';
 
 export default function DashboardPage() {
   const { status, walletAddress, walletName, coinPublicKey, network, contractAddress, connectWallet, connectionError, deployContractAction, hasShieldedAccount } = useMidnight();
@@ -12,12 +12,12 @@ export default function DashboardPage() {
   const [deploying, setDeploying] = useState(false);
   const [deployStatus, setDeployStatus] = useState<'idle' | 'waiting' | 'submitted' | 'done' | 'error'>('idle');
   const [deployedAddress, setDeployedAddress] = useState<string | null>(contractAddress);
+  const [deployError, setDeployError] = useState<string | null>(null);
 
   // Keep deployedAddress in sync with context (e.g. after localStorage hydration)
   useEffect(() => {
     if (contractAddress && !deployedAddress) setDeployedAddress(contractAddress);
   }, [contractAddress]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [deployError, setDeployError] = useState<string | null>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -25,23 +25,6 @@ export default function DashboardPage() {
     setConnecting(true);
     await connectWallet();
     setConnecting(false);
-  };
-
-  const handleDeploy = async () => {
-    setDeployError(null);
-    setDeployStatus('waiting');
-    setDeploying(true);
-    try {
-      const addr = await deployContractAction();
-      setDeployStatus('done');
-      setDeployedAddress(addr);
-    } catch (e: any) {
-      console.error(e);
-      setDeployError(e?.message || 'Deployment failed. Check wallet and balance.');
-      setDeployStatus('error');
-    } finally {
-      setDeploying(false);
-    }
   };
 
   if (!mounted) return null;
@@ -52,29 +35,22 @@ export default function DashboardPage() {
 
   if (status !== 'connected') {
     return (
-      <div className="page-container" style={{ paddingTop: 80, paddingBottom: 80, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <div className="card" style={{ padding: 48, textAlign: 'center', maxWidth: 480, width: '100%' }}>
-          <div style={{
-            width: 64, height: 64, borderRadius: '50%',
-            background: 'var(--accent-dim)', border: '1px solid rgba(124,92,252,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px',
-          }}>
-            <Wallet size={28} color="var(--accent)" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="glass-panel p-10 text-center max-w-md w-full">
+          <div className="w-16 h-16 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center mx-auto mb-6">
+            <Wallet size={28} className="text-brand-500" />
           </div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>Dashboard</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: 28, fontSize: 15 }}>
-            Connect your wallet to access your membership control panel.
-          </p>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Dashboard</h2>
+          <p className="text-slate-600 mb-6">Connect your wallet to access your membership control panel.</p>
           <button
-            className="btn btn-primary"
+            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-bold transition-all disabled:opacity-50 shadow-lg shadow-brand-500/20"
             onClick={handleConnect}
             disabled={connecting || status === 'connecting'}
-            style={{ width: '100%', justifyContent: 'center' }}
           >
-            {connecting || status === 'connecting' ? <><span className="spinner" /> Connecting…</> : 'Connect Wallet'}
+            {connecting || status === 'connecting' ? <><Loader2 size={18} className="animate-spin" /> Connecting…</> : 'Connect Wallet'}
           </button>
           {status === 'error' && connectionError && (
-            <div style={{ marginTop: 12, fontSize: 13, color: 'var(--red)', padding: '8px 12px', background: 'var(--red-dim)', borderRadius: 8 }}>
+            <div className="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
               {connectionError}
             </div>
           )}
@@ -84,136 +60,130 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="page-container" style={{ paddingTop: 48, paddingBottom: 80 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 32 }}>
+    <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 6 }}>Dashboard</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Your membership control panel.</p>
+          <h1 className="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Dashboard</h1>
+          <p className="text-slate-600">Your membership control panel.</p>
         </div>
-        <span className="badge badge-green" style={{ marginTop: 8 }}>
-          <span className="dot-pulse dot-green" />Session Active
-        </span>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-600 text-sm font-semibold border border-emerald-200 shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" /> Session Active
+        </div>
       </div>
 
       {/* Stat cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: 16, marginBottom: 32,
-      }}>
-        {/* Wallet card */}
-        <div className="card" style={{ padding: 20, borderLeft: '3px solid var(--accent)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)' }}>Wallet</div>
-            <Wallet size={16} color="var(--accent)" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Wallet */}
+        <div className="glass-panel p-6 border-l-4 border-l-brand-500">
+          <div className="flex justify-between items-center mb-3">
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Wallet</div>
+            <Wallet size={18} className="text-brand-500" />
           </div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace', wordBreak: 'break-all', marginBottom: 4 }}>
-            {shortAddr}
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{walletName}</div>
+          <div className="text-sm font-bold text-slate-900 font-mono break-all mb-1">{shortAddr}</div>
+          <div className="text-xs text-slate-500">{walletName}</div>
         </div>
 
-        {/* Network card */}
-        <div className="card" style={{ padding: 20, borderLeft: '3px solid #60a5fa' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)' }}>Network</div>
-            <Activity size={16} color="#60a5fa" />
+        {/* Network */}
+        <div className="glass-panel p-6 border-l-4 border-l-blue-500">
+          <div className="flex justify-between items-center mb-3">
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Network</div>
+            <Activity size={18} className="text-blue-500" />
           </div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{network.name}</div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Midnight blockchain</div>
+          <div className="text-sm font-bold text-slate-900 mb-1">{network.name}</div>
+          <div className="text-xs text-slate-500">Midnight blockchain</div>
         </div>
 
-        {/* Membership card */}
-        <div className="card" style={{ padding: 20, borderLeft: '3px solid #22c55e' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)' }}>Membership</div>
-            <Shield size={16} color="#22c55e" />
+        {/* Membership */}
+        <div className="glass-panel p-6 border-l-4 border-l-emerald-500">
+          <div className="flex justify-between items-center mb-3">
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Membership</div>
+            <Shield size={18} className="text-emerald-500" />
           </div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+          <div className="text-sm font-bold text-slate-900 mb-1">
             {deployedAddress ? 'Active' : 'Pending'}
           </div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          <div className="text-xs text-slate-500">
             {deployedAddress ? 'Contract deployed' : 'Contract not deployed'}
           </div>
         </div>
 
-        {/* Contract card */}
-        <div className="card" style={{ padding: 20, borderLeft: '3px solid #a78bfa' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)' }}>Contract</div>
-            <Key size={16} color="#a78bfa" />
+        {/* Contract */}
+        <div className="glass-panel p-6 border-l-4 border-l-purple-500">
+          <div className="flex justify-between items-center mb-3">
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Contract</div>
+            <Key size={18} className="text-purple-500" />
           </div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: deployedAddress ? 'var(--text-primary)' : 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', wordBreak: 'break-all', marginBottom: 4 }}>
+          <div className="text-xs font-bold font-mono break-all mb-1">
             {deployedAddress ? (
               <a 
                 href={`https://preview.midnightexplorer.com/contracts/${deployedAddress}`} 
                 target="_blank" 
                 rel="noreferrer" 
-                style={{ 
-                  color: '#fff', 
-                  textDecoration: 'none', 
-                  padding: '6px 10px', 
-                  background: 'var(--accent)', 
-                  borderRadius: 6, 
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 2px 4px rgba(124, 92, 252, 0.2)'
-                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-600 rounded-lg transition-colors border border-brand-200"
               >
-                {deployedAddress.slice(0, 10)}…{deployedAddress.slice(-8)} ↗
+                {deployedAddress.slice(0, 8)}…{deployedAddress.slice(-6)} ↗
               </a>
-            ) : 'Not configured'}
+            ) : <span className="text-slate-400">Not configured</span>}
           </div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Organisation registry</div>
+          <div className="text-xs text-slate-500">Organisation registry</div>
         </div>
       </div>
 
       {/* Quick actions */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 32 }}>
-        <Link href="/membership" className="card card-interactive" style={{ padding: 24, textDecoration: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Link href="/membership" className="glass-panel p-6 flex justify-between items-center group cursor-pointer transition-all hover:-translate-y-1">
           <div>
-            <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-primary)', marginBottom: 4 }}>Manage Membership</div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Join or update your membership status</div>
+            <div className="font-bold text-lg text-slate-900 mb-1 group-hover:text-brand-500 transition-colors">Manage Membership</div>
+            <div className="text-sm text-slate-600">Join or update your membership status</div>
           </div>
-          <ArrowRight size={20} color="var(--text-muted)" />
+          <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-brand-50 group-hover:text-brand-500 text-slate-400 transition-colors">
+            <ArrowRight size={20} />
+          </div>
         </Link>
-        <Link href="/verify" className="card card-interactive" style={{ padding: 24, textDecoration: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        
+        <Link href="/verify" className="glass-panel p-6 flex justify-between items-center group cursor-pointer transition-all hover:-translate-y-1">
           <div>
-            <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-primary)', marginBottom: 4 }}>Verify Membership</div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Generate a zero-knowledge membership proof</div>
+            <div className="font-bold text-lg text-slate-900 mb-1 group-hover:text-brand-500 transition-colors">Verify Membership</div>
+            <div className="text-sm text-slate-600">Generate a zero-knowledge membership proof</div>
           </div>
-          <ArrowRight size={20} color="var(--text-muted)" />
+          <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-brand-50 group-hover:text-brand-500 text-slate-400 transition-colors">
+            <ArrowRight size={20} />
+          </div>
         </Link>
       </div>
 
-      {/* Deploy panel */}
-      <div className="card" style={{ padding: 28 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <Server size={20} color="var(--accent)" />
-          <h2 style={{ fontSize: 18, fontWeight: 700 }}>Contract Status</h2>
+      {/* Contract Status Panel */}
+      <div className="glass-panel p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-brand-50 rounded-lg">
+            <Server size={20} className="text-brand-500" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">System Status</h2>
         </div>
 
         {/* Readiness checklist */}
-        <div style={{ marginBottom: 24 }}>
+        <div className="space-y-4 mb-6">
           {[
             { label: 'Wallet', ok: status === 'connected', value: status === 'connected' ? `Connected (${walletName})` : 'Not connected' },
             { label: 'Network', ok: true, value: network.name },
-            { label: 'Contract', ok: true, value: 'Anonymous Membership Organisation (compiled)' },
-            { label: 'Contract Address', ok: !!deployedAddress, value: deployedAddress ? `${deployedAddress.slice(0, 24)}…` : 'Not deployed' },
-          ].map(item => (
-            <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 12, paddingBottom: 10, borderBottom: '1px solid var(--border)', marginBottom: 10 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.ok ? 'var(--green)' : 'var(--amber)', flexShrink: 0 }} />
-              <div style={{ fontSize: 13, color: 'var(--text-muted)', width: 120, flexShrink: 0, fontWeight: 600 }}>{item.label}</div>
-              <div style={{ fontSize: 13, color: 'var(--text-primary)', fontFamily: item.label === 'Contract Address' ? 'JetBrains Mono, monospace' : 'inherit' }}>{item.value}</div>
+            { label: 'Contract', ok: true, value: 'Anonymous Membership (Compiled)' },
+            { label: 'Contract Address', ok: !!deployedAddress, value: deployedAddress ? `${deployedAddress.slice(0, 16)}…` : 'Not deployed' },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-0">
+              <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${item.ok ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-amber-500 shadow-[0_0_8px_#f59e0b]'}`} />
+              <div className="w-36 text-sm font-semibold text-slate-500 flex-shrink-0">{item.label}</div>
+              <div className={`text-sm text-slate-900 ${item.label === 'Contract Address' ? 'font-mono' : ''}`}>{item.value}</div>
             </div>
           ))}
         </div>
 
         {!hasShieldedAccount && status === 'connected' && (
-          <div style={{ marginBottom: 16, padding: '12px 16px', background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: 10, fontSize: 13, color: '#f59e0b' }}>
-            <strong>⚠ No shielded account detected.</strong> Your wallet is connected in unshielded mode.
-            Open your Lace / 1AM extension → switch to <strong>Midnight Preprod</strong> → enable the <strong>Shielded account</strong>, then reconnect.
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 flex items-start gap-3">
+            <Shield size={20} className="text-amber-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <strong className="block mb-1">No shielded account detected.</strong>
+              Your wallet is connected in unshielded mode. Open your Lace / 1AM extension → switch to <strong>Midnight Preprod</strong> → enable the <strong>Shielded account</strong>, then reconnect.
+            </div>
           </div>
         )}
       </div>

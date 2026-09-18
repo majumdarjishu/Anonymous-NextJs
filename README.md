@@ -14,7 +14,7 @@ Enterprise Zero-Knowledge Organization Membership & Verification built natively 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/majumdarjishu/Anonymous-organization-membership-NextJs)
 [![Contract Address](https://img.shields.io/badge/Contract-c340a2b...610d-8A2BE2?style=for-the-badge&logo=polkadot&logoColor=white)](https://preview.midnightexplorer.com/contracts/c340a2b0427dc519342ee344a54b23651420413b35142442635d9eab9aae610d)
 
-**Deployed Contract Address (Preprod):** `c340a2b0427dc519342ee344a54b23651420413b35142442635d9eab9aae610d`
+**Deployed Contract Address (Preview):** `c340a2b0427dc519342ee344a54b23651420413b35142442635d9eab9aae610d`
 
 ## 📸 Application Screenshots
 
@@ -140,7 +140,7 @@ NODE_OPTIONS="--max-old-space-size=12288" npm run deploy -- --network preprod
 Once deployed, create a `.env.local` inside the `ui/` folder:
 ```env
 NEXT_PUBLIC_MIDNIGHT_NETWORK=preprod
-NEXT_PUBLIC_CONTRACT_ADDRESS=<YOUR_DEPLOYED_CONTRACT_ADDRESS>
+NEXT_PUBLIC_CONTRACT_ADDRESS=c340a2b0427dc519342ee344a54b23651420413b35142442635d9eab9aae610d
 ```
 
 ## ✅ Feature & Compliance Checklist
@@ -189,3 +189,4 @@ anonymous-membership-organisation/
 
 ## 📄 License
 This project is open-source and distributed under the MIT License.
+# Anonymous-NextJs

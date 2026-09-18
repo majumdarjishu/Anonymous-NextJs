@@ -2,7 +2,7 @@
 
 import { useMidnight } from '@/context/MidnightContext';
 import { useState, useEffect } from 'react';
-import { UserPlus, CheckCircle, Clock, Loader2, ShieldCheck } from 'lucide-react';
+import { UserPlus, CheckCircle, Clock, Loader2, ShieldCheck, Shield } from 'lucide-react';
 
 export default function MembershipPage() {
   const { status, walletAddress, walletName, connectWallet, connectionError, contractAddress } = useMidnight();
@@ -63,45 +63,47 @@ export default function MembershipPage() {
   if (!mounted) return null;
 
   return (
-    <div className="page-container" style={{ paddingTop: 48, paddingBottom: 80, maxWidth: 700 }}>
-      <div style={{ marginBottom: 40 }}>
-        <h1 style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 10 }}>
+    <div className="max-w-3xl mx-auto px-6 py-12">
+      <div className="mb-10 text-center sm:text-left">
+        <h1 className="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">
           Membership
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 16 }}>
+        <p className="text-slate-600 text-lg">
           Join the Anonymous Membership Organisation. Your private credentials never leave your device.
         </p>
       </div>
 
       {/* Wallet status panel */}
-      <div className="card" style={{ padding: 24, marginBottom: 20 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 12 }}>
+      <div className="glass-panel p-6 mb-6">
+        <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">
           Wallet
         </div>
         {status === 'connected' ? (
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div className="flex justify-between items-center flex-wrap gap-3">
             <div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace' }}>
+              <div className="text-sm font-bold text-slate-900 font-mono">
                 {walletAddress ? `${walletAddress.slice(0, 12)}…${walletAddress.slice(-8)}` : '—'}
               </div>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{walletName}</div>
+              <div className="text-xs text-slate-500 mt-1">{walletName}</div>
             </div>
-            <span className="badge badge-green"><span className="dot-pulse dot-green" />Connected</span>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold border border-emerald-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Connected
+            </span>
           </div>
         ) : (
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>Not connected</span>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
+            <span className="text-slate-500 text-sm">Not connected</span>
             <button
-              className="btn btn-primary"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-bold transition-all disabled:opacity-50 shadow-lg shadow-brand-500/20"
               onClick={handleConnect}
               disabled={connecting || status === 'connecting'}
             >
-              {connecting || status === 'connecting' ? <><span className="spinner" /> Connecting…</> : 'Connect Wallet'}
+              {connecting || status === 'connecting' ? <><Loader2 size={16} className="animate-spin" /> Connecting…</> : 'Connect Wallet'}
             </button>
           </div>
         )}
         {status === 'error' && connectionError && (
-          <div style={{ marginTop: 12, fontSize: 13, color: 'var(--red)', padding: '8px 12px', background: 'var(--red-dim)', borderRadius: 8 }}>
+          <div className="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100 font-medium">
             {connectionError}
           </div>
         )}
@@ -109,88 +111,87 @@ export default function MembershipPage() {
 
       {/* Membership status panel */}
       {status === 'connected' && (
-        <div className="card" style={{ padding: 24, marginBottom: 20 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 16 }}>
+        <div className="glass-panel p-6 mb-6">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">
             Membership Status
           </div>
 
           {membershipState === 'active' ? (
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-                <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--green-dim)', border: '1px solid rgba(34,197,94,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ShieldCheck size={22} color="var(--green)" />
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck size={24} className="text-emerald-500" />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 18, color: 'var(--text-primary)' }}>✓ Active Member</div>
-                  <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
+                  <div className="font-bold text-xl text-slate-900">✓ Active Member</div>
+                  <div className="text-sm text-slate-600 mt-1">
                     Your membership is active. Your private credentials are not displayed.
                   </div>
                 </div>
               </div>
 
               {txHash && (
-                <div style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
                     Transaction
                   </div>
-                  <div style={{ fontSize: 12, fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-secondary)', wordBreak: 'break-all' }}>
+                  <div className="text-xs font-mono text-slate-600 break-all">
                     {txHash}
                   </div>
                 </div>
               )}
             </div>
           ) : membershipState === 'joining' ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span className="spinner" style={{ width: 24, height: 24 }} />
+            <div className="flex items-center gap-4 py-4">
+              <Loader2 size={28} className="text-brand-500 animate-spin" />
               <div>
-                <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 15 }}>Submitting membership…</div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>Waiting for wallet approval and confirmation.</div>
+                <div className="font-bold text-lg text-slate-900">Submitting membership…</div>
+                <div className="text-sm text-slate-600 mt-1">Waiting for wallet approval and confirmation.</div>
               </div>
             </div>
           ) : (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-                <Clock size={16} color="var(--text-muted)" />
-                <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Not yet a member</span>
+              <div className="flex items-center gap-2 mb-6 text-slate-500">
+                <Clock size={18} />
+                <span className="text-sm font-medium">Not yet a member</span>
               </div>
 
               {/* Join form */}
-              <div>
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 8 }}>
+              <div className="max-w-md">
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Membership ID
                   </label>
                   <input
                     type="number"
-                    className="input-field"
+                    className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all text-slate-900 font-mono"
                     placeholder="e.g. 10042"
                     value={membershipId}
                     onChange={e => setMembershipId(e.target.value)}
                   />
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
+                  <div className="text-xs text-slate-500 mt-2 font-medium">
                     A public identifier for your membership slot. Your identity remains private.
                   </div>
                 </div>
 
                 {!contractAddress && (
-                  <div style={{ padding: '10px 14px', background: 'var(--amber-dim)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, fontSize: 13, color: 'var(--amber)', marginBottom: 16 }}>
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 mb-6 font-medium">
                     ⚠ No contract configured. The administrator must deploy the contract first.
                   </div>
                 )}
 
                 {error && (
-                  <div style={{ padding: '10px 14px', background: 'var(--red-dim)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, fontSize: 13, color: 'var(--red)', marginBottom: 16 }}>
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 mb-6 font-medium">
                     {error}
                   </div>
                 )}
 
                 <button
-                  className="btn btn-primary"
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-bold transition-all disabled:opacity-50 shadow-lg shadow-brand-500/20"
                   onClick={handleJoin}
-                  style={{ width: '100%', justifyContent: 'center' }}
                   disabled={!membershipId || connecting}
                 >
-                  <UserPlus size={16} /> Join Organisation
+                  <UserPlus size={18} /> Join Organisation
                 </button>
               </div>
             </>
@@ -200,15 +201,15 @@ export default function MembershipPage() {
 
       {/* Private membership notice */}
       {status === 'connected' && (
-        <div className="card" style={{ padding: 20, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-          <div style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 2 }}>
-            <CheckCircle size={18} />
+        <div className="glass-panel p-6 flex gap-4 items-start">
+          <div className="text-brand-500 flex-shrink-0 mt-0.5">
+            <CheckCircle size={20} />
           </div>
           <div>
-            <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)', marginBottom: 4 }}>
+            <div className="font-bold text-slate-900 mb-1">
               Private Membership
             </div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            <div className="text-sm text-slate-600 leading-relaxed">
               Your membership credentials are handled as a zero-knowledge commitment.
               The organisation never sees your name, email, or private secret — only a cryptographic proof of membership validity.
             </div>

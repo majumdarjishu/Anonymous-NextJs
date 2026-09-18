@@ -13,8 +13,8 @@ export interface NetworkConfig {
 const NETWORKS: Record<string, NetworkConfig> = {
   local: {
     name: 'Local Devnet',
-    indexer: 'http://localhost:8088/api/v1/graphql',
-    indexerWS: 'ws://localhost:8088/api/v1/graphql/ws',
+    indexer: 'http://localhost:8089/api/v1/graphql',
+    indexerWS: 'ws://localhost:8089/api/v1/graphql/ws',
     proofServer: 'http://localhost:6300',
     zkConfigPathUrl: '/contracts/managed/anonymous-membership-organisation',
   },
@@ -233,7 +233,7 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
   const [hasShieldedAccount, setHasShieldedAccount] = useState(false);
 
   const [contractAddress, setContractAddress] = useState<string | null>(
-    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || 'c340a2b0427dc519342ee344a54b23651420413b35142442635d9eab9aae610d'
+    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef'
   );
 
   useEffect(() => {
@@ -251,7 +251,7 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const envNetwork = process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK || 'preprod';
+  const envNetwork = process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK || 'local';
   const network = NETWORKS[envNetwork] || NETWORKS.preprod;
 
   const connectWallet = useCallback(async () => {
@@ -301,15 +301,21 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
 
     const { deployContract } = await import('@midnight-ntwrk/midnight-js-contracts');
     const { createMidnightProviders, getCompiledContract, PRIVATE_STATE_ID } = await import('../lib/midnight');
+    const { fromHex } = await import('@midnight-ntwrk/midnight-js-utils');
 
     const providers = await createMidnightProviders(walletApi, network);
     const compiledContract = await getCompiledContract(network.zkConfigPathUrl);
 
     const deployed = await deployContract(providers, {
       privateStateId: PRIVATE_STATE_ID,
-      initialPrivateState: {},
+      initialPrivateState: {
+        credential: () => ({
+          secret: new Uint8Array(32),
+          membershipId: 0n
+        })
+      },
       compiledContract: compiledContract as any,
-      args: [providers.walletProvider.coinPublicKey],
+      args: [typeof providers.walletProvider.coinPublicKey === 'string' ? fromHex(providers.walletProvider.coinPublicKey as string) : providers.walletProvider.coinPublicKey],
     });
 
     const address = deployed.deployTxData.public.contractAddress;

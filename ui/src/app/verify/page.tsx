@@ -2,7 +2,7 @@
 
 import { useMidnight } from '@/context/MidnightContext';
 import { useState, useEffect } from 'react';
-import { Fingerprint, CheckCircle, XCircle, Shield, Eye, EyeOff } from 'lucide-react';
+import { Fingerprint, CheckCircle, XCircle, Shield, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 type ProofState = 'idle' | 'generating' | 'verified' | 'invalid' | 'error' | 'ready';
 
@@ -62,33 +62,33 @@ export default function VerifyPage() {
   }[proofState];
 
   return (
-    <div className="page-container" style={{ paddingTop: 48, paddingBottom: 80, maxWidth: 680 }}>
-      <div style={{ marginBottom: 40 }}>
-        <h1 style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 10 }}>
+    <div className="max-w-3xl mx-auto px-6 py-12">
+      <div className="mb-10 text-center sm:text-left">
+        <h1 className="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">
           Verify Membership
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: 16 }}>
+        <p className="text-slate-600 text-lg">
           Prove you are a valid member without revealing your identity.
         </p>
       </div>
 
       {/* Wallet required */}
       {status !== 'connected' && (
-        <div className="card" style={{ padding: 32, textAlign: 'center', marginBottom: 20 }}>
-          <Shield size={40} style={{ color: 'var(--text-muted)', margin: '0 auto 16px' }} />
-          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Connect Your Wallet</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24 }}>
+        <div className="glass-panel p-10 text-center mb-6 max-w-lg mx-auto">
+          <Shield size={40} className="text-slate-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Connect Your Wallet</h2>
+          <p className="text-slate-600 text-sm mb-6">
             You must connect your wallet to generate a membership proof.
           </p>
           <button
-            className="btn btn-primary"
+            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-bold transition-all disabled:opacity-50 shadow-lg shadow-brand-500/20"
             onClick={handleConnect}
             disabled={connecting || status === 'connecting'}
           >
-            {connecting || status === 'connecting' ? <><span className="spinner" /> Connecting…</> : 'Connect Wallet'}
+            {connecting || status === 'connecting' ? <><Loader2 size={18} className="animate-spin" /> Connecting…</> : 'Connect Wallet'}
           </button>
           {status === 'error' && connectionError && (
-            <div style={{ marginTop: 12, fontSize: 13, color: 'var(--red)', padding: '8px 12px', background: 'var(--red-dim)', borderRadius: 8 }}>
+            <div className="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
               {connectionError}
             </div>
           )}
@@ -98,159 +98,149 @@ export default function VerifyPage() {
       {status === 'connected' && (
         <>
           {/* Status row */}
-          <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-            <div className="card" style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 10, flex: '1 1 auto' }}>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Wallet</div>
-              <span className="badge badge-green"><span className="dot-pulse dot-green" />Connected</span>
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div className="glass-panel px-5 py-3 flex items-center gap-3 flex-1 min-w-[200px]">
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Wallet</div>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Connected
+              </span>
             </div>
-            <div className="card" style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 10, flex: '1 1 auto' }}>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Proof Status</div>
-              <span className={`badge ${
-                proofState === 'verified' ? 'badge-green' :
-                proofState === 'invalid' || proofState === 'error' ? 'badge-red' :
-                proofState === 'generating' ? 'badge-amber' : 'badge-neutral'
+            <div className="glass-panel px-5 py-3 flex items-center gap-3 flex-1 min-w-[200px]">
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Proof Status</div>
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                proofState === 'verified' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                proofState === 'invalid' || proofState === 'error' ? 'bg-red-50 text-red-600 border-red-200' :
+                proofState === 'generating' ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200'
               }`}>
-                {proofState === 'generating' && <span className="dot-pulse dot-amber" />}
+                {proofState === 'generating' && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />}
                 {statusLabel}
               </span>
             </div>
           </div>
 
           {/* Proof form or result */}
-          <div className="card" style={{ padding: 28 }}>
+          <div className="glass-panel p-8 max-w-2xl mx-auto">
             {proofState === 'verified' ? (
-              <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                <div style={{
-                  width: 72, height: 72, borderRadius: '50%',
-                  background: 'var(--green-dim)', border: '1px solid rgba(34,197,94,0.3)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  margin: '0 auto 20px',
-                }}>
-                  <CheckCircle size={36} color="var(--green)" />
+              <div className="text-center py-6">
+                <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle size={40} className="text-emerald-500" />
                 </div>
-                <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>✓ Membership Verified</h2>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>
+                <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Membership Verified</h2>
+                <p className="text-slate-600 mb-8">
                   Your zero-knowledge proof was validated successfully.
                 </p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 28, textAlign: 'left' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-left">
                   {[
                     { label: 'Identity', value: 'Not Revealed' },
                     { label: 'Membership', value: 'Valid' },
                   ].map(item => (
-                    <div key={item.label} style={{ padding: '14px 16px', background: 'var(--green-dim)', borderRadius: 10, border: '1px solid rgba(34,197,94,0.15)' }}>
-                      <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--green)', marginBottom: 4 }}>
+                    <div key={item.label} className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                      <div className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-1">
                         {item.label}
                       </div>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{item.value}</div>
+                      <div className="text-lg font-bold text-slate-900">{item.value}</div>
                     </div>
                   ))}
                 </div>
-                <button className="btn btn-outline" onClick={reset}>
+                <button 
+                  className="px-6 py-3 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-900 transition-colors"
+                  onClick={reset}
+                >
                   Verify Again
                 </button>
               </div>
             ) : proofState === 'error' || proofState === 'invalid' ? (
-              <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                <div style={{
-                  width: 72, height: 72, borderRadius: '50%',
-                  background: 'var(--red-dim)', border: '1px solid rgba(239,68,68,0.3)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  margin: '0 auto 20px',
-                }}>
-                  <XCircle size={36} color="var(--red)" />
+              <div className="text-center py-6">
+                <div className="w-20 h-20 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto mb-6">
+                  <XCircle size={40} className="text-red-500" />
                 </div>
-                <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Verification Failed</h2>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: 8 }}>
+                <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Verification Failed</h2>
+                <p className="text-slate-600 mb-4">
                   The proof was rejected. Your credentials may be incorrect or your membership may be inactive.
                 </p>
-                {error && <p style={{ fontSize: 13, color: 'var(--red)', marginBottom: 20 }}>{error}</p>}
-                <button className="btn btn-outline" onClick={reset}>
+                {error && <p className="text-sm text-red-600 mb-8 font-medium">{error}</p>}
+                <button 
+                  className="px-6 py-3 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-900 transition-colors"
+                  onClick={reset}
+                >
                   Try Again
                 </button>
               </div>
             ) : proofState === 'generating' ? (
-              <div style={{ textAlign: 'center', padding: '32px 0' }}>
-                <div style={{
-                  width: 72, height: 72, borderRadius: '50%',
-                  background: 'var(--accent-dim)', border: '1px solid rgba(124,92,252,0.3)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  margin: '0 auto 20px',
-                }}>
-                  <Fingerprint size={36} color="var(--accent)" className="animate-spin" />
+              <div className="text-center py-10">
+                <div className="w-20 h-20 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center mx-auto mb-6">
+                  <Fingerprint size={40} className="text-brand-500 animate-spin" />
                 </div>
-                <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Generating private proof…</h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+                <h2 className="text-2xl font-bold text-slate-900 mb-3">Generating private proof…</h2>
+                <p className="text-slate-600 text-sm max-w-sm mx-auto">
                   Your zero-knowledge proof is being computed locally. This may take a moment.
                 </p>
               </div>
             ) : (
               <>
-                <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>
-                  <Fingerprint size={18} style={{ display: 'inline', marginRight: 8, color: 'var(--accent)' }} />
+                <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                  <Fingerprint size={24} className="text-brand-500" />
                   Generate Membership Proof
                 </h2>
 
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 8 }}>
-                    Membership ID
-                  </label>
-                  <input
-                    type="number"
-                    className="input-field"
-                    placeholder="Your membership ID"
-                    value={membershipId}
-                    onChange={e => setMembershipId(e.target.value)}
-                  />
-                </div>
-
-                <div style={{ marginBottom: 20 }}>
-                  <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: 8 }}>
-                    Private Secret
-                  </label>
-                  <div style={{ position: 'relative' }}>
+                <div className="space-y-6 mb-8">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Membership ID
+                    </label>
                     <input
-                      type={showSecret ? 'text' : 'password'}
-                      className="input-field input-mono"
-                      placeholder="Your private credential secret"
-                      value={secret}
-                      onChange={e => setSecret(e.target.value)}
-                      style={{ paddingRight: 44 }}
+                      type="number"
+                      className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all text-slate-900 font-mono"
+                      placeholder="Your membership ID"
+                      value={membershipId}
+                      onChange={e => setMembershipId(e.target.value)}
                     />
-                    <button
-                      type="button"
-                      onClick={() => setShowSecret(s => !s)}
-                      style={{
-                        position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-                        background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)',
-                      }}
-                    >
-                      {showSecret ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
-                    Your secret is never sent to any server. Proof computation happens locally.
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Private Secret
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showSecret ? 'text' : 'password'}
+                        className="w-full px-4 py-3 pr-12 rounded-xl bg-white border border-slate-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all text-slate-900 font-mono"
+                        placeholder="Your private credential secret"
+                        value={secret}
+                        onChange={e => setSecret(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSecret(s => !s)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        {showSecret ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                    <div className="text-xs text-slate-500 mt-2 font-medium">
+                      Your secret is never sent to any server. Proof computation happens locally.
+                    </div>
                   </div>
                 </div>
 
                 {!contractAddress && (
-                  <div style={{ padding: '10px 14px', background: 'var(--amber-dim)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 8, fontSize: 13, color: 'var(--amber)', marginBottom: 16 }}>
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 mb-6 font-medium">
                     ⚠ No contract configured. Verification requires a deployed contract.
                   </div>
                 )}
 
                 {error && (
-                  <div style={{ padding: '10px 14px', background: 'var(--red-dim)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, fontSize: 13, color: 'var(--red)', marginBottom: 16 }}>
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600 mb-6 font-medium">
                     {error}
                   </div>
                 )}
 
                 <button
-                  className="btn btn-primary"
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-bold transition-all disabled:opacity-50 shadow-lg shadow-brand-500/20 text-lg"
                   onClick={handleVerify}
-                  style={{ width: '100%', justifyContent: 'center' }}
                   disabled={connecting || !membershipId || !secret}
                 >
-                  <Fingerprint size={16} /> Generate Membership Proof
+                  <Fingerprint size={20} /> Generate Membership Proof
                 </button>
               </>
             )}
