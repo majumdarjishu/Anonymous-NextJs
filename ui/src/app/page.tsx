@@ -178,13 +178,13 @@ export default function HomePage() {
         </div>
         <div className="flex gap-6 text-sm">
           <a
-            href="https://github.com/majumdarjishu/Anonymous-organization-membership-NextJs"
+            href="https://github.com/majumdarjishu/Anonymous-NextJs"
             target="_blank" rel="noreferrer"
             className="text-muted hover:text-main transition-colors"
           >
             GitHub
           </a>
-          <span className="text-brand-400">Midnight Preprod</span>
+          <span className="text-brand-400">Midnight Preview</span>
         </div>
       </motion.div>
     </div>

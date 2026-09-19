@@ -2,7 +2,7 @@
 
 [![Network: Midnight Preprod](https://img.shields.io/badge/Network-Midnight_Preprod-8A2BE2?style=for-the-badge&logo=polkadot&logoColor=white)](https://midnight.network/)
 [![Smart Contract: Compact](https://img.shields.io/badge/Smart_Contract-Compact-FF69B4?style=for-the-badge&logo=web3.js&logoColor=white)](https://docs.midnight.network/)
-[![Build: Passing](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/majumdarjishu/Anonymous-organization-membership-NextJs/actions)
+[![Build: Passing](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/majumdarjishu/Anonymous-NextJs/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 Enterprise Zero-Knowledge Organization Membership & Verification built natively on the Midnight Network using Compact smart contracts, client-side ZK-SNARK proving, dual-state ledger privacy, and Next.js.
@@ -11,7 +11,7 @@ Enterprise Zero-Knowledge Organization Membership & Verification built natively 
 
 [![Live Video](https://img.shields.io/badge/YouTube-Live_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=D4IRcmAV-2Q)
 [![Live Deployment](https://img.shields.io/badge/Vercel-Live_Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://anonymous-organization-membership-n.vercel.app/)
-[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/majumdarjishu/Anonymous-organization-membership-NextJs)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/majumdarjishu/Anonymous-NextJs)
 [![Contract Address](https://img.shields.io/badge/Contract-f08cca5...3f1b-8A2BE2?style=for-the-badge&logo=polkadot&logoColor=white)](https://preview.midnightexplorer.com/contracts/f08cca551c180698e9e3a8b85ef6b192ac03f95350ec2bf38281b3219d193f1b)
 
 **Deployed Contract Address (Preview):** `f08cca551c180698e9e3a8b85ef6b192ac03f95350ec2bf38281b3219d193f1b`
@@ -96,8 +96,8 @@ The platform leverages Midnight's dual-state architecture where private witness 
 ### 2. Installation & Setup
 ```bash
 # Clone repository
-git clone https://github.com/majumdarjishu/Anonymous-organization-membership-NextJs.git
-cd Anonymous-organization-membership-NextJs
+git clone https://github.com/majumdarjishu/Anonymous-NextJs.git
+cd Anonymous-NextJs
 
 # Install root dependencies
 npm install
