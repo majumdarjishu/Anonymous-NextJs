@@ -6,13 +6,10 @@ import Link from 'next/link';
 import { Wallet, Shield, Activity, Key, ArrowRight, Server, Loader2, Check } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { status, walletAddress, walletName, coinPublicKey, network, contractAddress, connectWallet, connectionError, deployContractAction, hasShieldedAccount } = useMidnight();
+  const { status, walletAddress, walletName, coinPublicKey, network, contractAddress, connectWallet, connectionError, deployContractAction, hasShieldedAccount, txStatus, txError } = useMidnight();
   const [connecting, setConnecting] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [deploying, setDeploying] = useState(false);
-  const [deployStatus, setDeployStatus] = useState<'idle' | 'waiting' | 'submitted' | 'done' | 'error'>('idle');
   const [deployedAddress, setDeployedAddress] = useState<string | null>(contractAddress);
-  const [deployError, setDeployError] = useState<string | null>(null);
 
   // Keep deployedAddress in sync with context (e.g. after localStorage hydration)
   useEffect(() => {
@@ -177,13 +174,30 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {!hasShieldedAccount && status === 'connected' && (
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 flex items-start gap-3">
-            <Shield size={20} className="text-amber-500 flex-shrink-0 mt-0.5" />
-            <div>
-              <strong className="block mb-1">No shielded account detected.</strong>
-              Your wallet is connected in unshielded mode. Open your Lace / 1AM extension → switch to <strong>Midnight Preprod</strong> → enable the <strong>Shielded account</strong>, then reconnect.
-            </div>
+        {/* Deployment UI */}
+        {!deployedAddress && status === 'connected' && (
+          <div className="mt-6 p-4 border border-brand-200 bg-brand-50 rounded-xl">
+            <h3 className="text-sm font-bold text-slate-900 mb-2">Contract Not Deployed</h3>
+            <p className="text-xs text-slate-600 mb-4">You need to deploy the membership contract to the network before you can interact with it.</p>
+            <button
+              onClick={async () => {
+                try {
+                  const addr = await deployContractAction();
+                  setDeployedAddress(addr);
+                } catch (err) {
+                  console.error(err);
+                }
+              }}
+              disabled={txStatus !== 'idle' && txStatus !== 'failed' && txStatus !== 'confirmed'}
+              className="w-full sm:w-auto px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold rounded-lg shadow disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {(txStatus === 'submitting' || txStatus === 'submitted' || txStatus === 'confirming') ? (
+                <><Loader2 size={16} className="animate-spin" /> {txStatus.charAt(0).toUpperCase() + txStatus.slice(1)}...</>
+              ) : txStatus === 'confirmed' ? (
+                <><Check size={16} /> Deployed!</>
+              ) : 'Deploy Contract'}
+            </button>
+            {txError && <p className="text-xs text-red-500 mt-3 whitespace-pre-wrap font-medium">{txError}</p>}
           </div>
         )}
       </div>

@@ -1,5 +1,5 @@
 /**
- * Deploy anonymous-membership-organisation contract to a Midnight network (undeployed by default; use --network preview|preprod for public networks).
+ * Deploy anonymous-membership-organisation contract to a Midnight network (undeployed by default; use --network preview|preview for public networks).
  *
  * Non-interactive: scaffold → npm run setup runs straight through.
  * No readline prompts, no .midnight-seed file.
@@ -88,7 +88,7 @@ const compiledContract = CompiledContract.make('anonymous-membership-organisatio
 async function createProviders(walletCtx: WalletContext) {
   // The SDK requires the private-state password to be at least 16 characters.
   // The default below is for local devnet only — set a strong
-  // password via environment variables for preprod or mainnet.
+  // password via environment variables for preview or mainnet.
   const privateStatePassword = process.env.PRIVATE_STATE_PASSWORD?.trim() || 'Local-development-password-1!';
 
   const walletProvider = {

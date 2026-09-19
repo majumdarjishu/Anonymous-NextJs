@@ -25,7 +25,7 @@ describe('E2E Smoke Check Suite', () => {
     if (fs.existsSync(statePath)) {
       const content = JSON.parse(fs.readFileSync(statePath, 'utf-8'));
       assert.equal(typeof content.version, 'number');
-      assert.ok(['undeployed', 'preview', 'preprod'].includes(content.activeNetwork));
+      assert.ok(['undeployed', 'preview', 'preview'].includes(content.activeNetwork));
     }
   });
 });

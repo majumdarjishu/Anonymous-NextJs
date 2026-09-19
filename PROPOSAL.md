@@ -65,7 +65,7 @@ The Compact smart contract (`contracts/anonymous-organization-membership.compact
 
 ```
   ┌────────────────┐         ┌──────────────────────┐         ┌─────────────────────┐         ┌───────────────────┐
-  │ Member Browser │         │  Midnight Lace Wallet│         │  Local Proof Server │         │  Midnight Preprod │
+  │ Member Browser │         │  Midnight Lace Wallet│         │  Local Proof Server │         │  Midnight preview │
   └───────┬────────┘         └──────────┬───────────┘         └──────────┬──────────┘         └─────────┬─────────┘
           │                             │                                │                              │
           │  1. Input Secret Credential │                                │                              │

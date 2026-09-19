@@ -25,13 +25,7 @@ const NETWORKS: Record<string, NetworkConfig> = {
     proofServer: 'http://localhost:6300',
     zkConfigPathUrl: '/contracts/managed/anonymous-membership-organisation',
   },
-  preprod: {
-    name: 'Midnight Preprod',
-    indexer: 'https://indexer.preprod.midnight.network/api/v4/graphql',
-    indexerWS: 'wss://indexer.preprod.midnight.network/api/v4/graphql/ws',
-    proofServer: 'http://localhost:6300',
-    zkConfigPathUrl: '/contracts/managed/anonymous-membership-organisation',
-  },
+
   preview: {
     name: 'Midnight Preview',
     indexer: 'https://indexer.preview.midnight.network/api/v4/graphql',
@@ -257,8 +251,8 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const envNetwork = process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK || 'local';
-  const network = NETWORKS[envNetwork] || NETWORKS.preprod;
+  const envNetwork = process.env.NEXT_PUBLIC_MIDNIGHT_NETWORK || 'preview';
+  const network = NETWORKS[envNetwork] || NETWORKS.preview;
 
   const connectWallet = useCallback(async () => {
     setStatus('connecting');

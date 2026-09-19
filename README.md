@@ -1,6 +1,6 @@
 # 🛡️ Anonymous Organization Membership
 
-[![Network: Midnight Preprod](https://img.shields.io/badge/Network-Midnight_Preprod-8A2BE2?style=for-the-badge&logo=polkadot&logoColor=white)](https://midnight.network/)
+[![Network: Midnight Preview](https://img.shields.io/badge/Network-Midnight_Preview-8A2BE2?style=for-the-badge&logo=polkadot&logoColor=white)](https://midnight.network/)
 [![Smart Contract: Compact](https://img.shields.io/badge/Smart_Contract-Compact-FF69B4?style=for-the-badge&logo=web3.js&logoColor=white)](https://docs.midnight.network/)
 [![Build: Passing](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/majumdarjishu/Anonymous-NextJs/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -20,8 +20,8 @@ Enterprise Zero-Knowledge Organization Membership & Verification built natively 
 
 | Screen | Description |
 |--------|-------------|
-| **Overview & Landing Page**<br>![Landing Page](screenshots/landing.png) | Hero section showcasing mathematical privacy, connected Midnight wallet, live Preprod network badge, and interactive membership exploration. |
-| **Operations & Dashboard**<br>![Dashboard](screenshots/dashboard.png) | Real-time membership control panel, wallet connection status, live Preprod blockchain state, and membership status monitoring. |
+| **Overview & Landing Page**<br>![Landing Page](screenshots/landing.png) | Hero section showcasing mathematical privacy, connected Midnight wallet, live Preview network badge, and interactive membership exploration. |
+| **Operations & Dashboard**<br>![Dashboard](screenshots/dashboard.png) | Real-time membership control panel, wallet connection status, live Preview blockchain state, and membership status monitoring. |
 | **Membership Check-In**<br>![Membership](screenshots/membership.png) | Private witness execution, client-side secret evaluation, and organization registration portal. |
 
 ## 🧠 Executive Summary & Problem Statement
@@ -60,7 +60,7 @@ The platform leverages Midnight's dual-state architecture where private witness 
 └─────────────────────────┼───────────────────────────────────────────────────┘
                           ▼ (Network Boundary: ZERO PII Transmitted)
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ MIDNIGHT PREPROD LEDGER                                                     │
+│ MIDNIGHT PREVIEW LEDGER                                                     │
 │                                                                             │
 │ PUBLIC ON-CHAIN STATE:                                                      │
 │ ✅ verificationCount — Aggregate counter incremented (+1)                   │
@@ -115,7 +115,7 @@ docker run -d --name vvp-proof-server -p 6300:6300 midnightnetwork/proof-server
 
 ### 4. Fund Testnet Wallet
 Get testnet tDUST / tNIGHT tokens from the official Faucet:
-- **Faucet URL**: [https://midnight-tmnight-preprod.nethermind.dev/](https://midnight-tmnight-preprod.nethermind.dev/)
+- **Faucet URL**: [https://midnight-tmnight-preview.nethermind.dev/](https://midnight-tmnight-preview.nethermind.dev/)
 - **Required**: `tDUST` to pay transaction fees. Convert `tNIGHT` to `tDUST` in your wallet extension.
 
 ### 5. Launch the Web Application
@@ -130,10 +130,10 @@ Open [http://localhost:3000](http://localhost:3000/).
 - The platform automatically scans `window.midnight` using the official `@midnight-ntwrk/dapp-connector-api` specification.
 - Select your detected wallet (1AM Wallet or Midnight Lace) and approve the authorization prompt.
 
-### 7. Deploying Contracts to Midnight Preprod
+### 7. Deploying Contracts to Midnight Preview
 Deployment is intentionally skipped in the repo. You must deploy the contract manually using your wallet seed or via the frontend deployment UI.
 ```bash
-NODE_OPTIONS="--max-old-space-size=12288" npm run deploy -- --network preprod
+NODE_OPTIONS="--max-old-space-size=12288" npm run deploy -- --network preview
 ```
 *(Alternatively, run `npm run dev` in the `ui/` folder and navigate to `http://localhost:3000/admin/deploy` to deploy it easily through your browser wallet).*
 

@@ -14,14 +14,14 @@ describe('Network & Wallet Resolution Utilities', () => {
   it('should correctly identify valid NetworkId values', () => {
     assert.equal(isNetworkId('undeployed'), true);
     assert.equal(isNetworkId('preview'), true);
-    assert.equal(isNetworkId('preprod'), true);
+    assert.equal(isNetworkId('preview'), true);
     assert.equal(isNetworkId('mainnet'), false);
     assert.equal(isNetworkId(123), false);
     assert.equal(isNetworkId(null), false);
   });
 
   it('should parse --network flag from command line arguments', () => {
-    assert.equal(parseNetworkFlag(['node', 'script.js', '--network', 'preprod']), 'preprod');
+    assert.equal(parseNetworkFlag(['node', 'script.js', '--network', 'preview']), 'preview');
     assert.equal(parseNetworkFlag(['node', 'script.js', '--network=preview']), 'preview');
     assert.equal(parseNetworkFlag(['node', 'script.js']), null);
   });
@@ -46,9 +46,9 @@ describe('Network & Wallet Resolution Utilities', () => {
     assert.equal(seed, GENESIS_SEED);
   });
 
-  it('should contain expected network configurations for preview and preprod', () => {
-    assert.ok(NETWORK_CONFIGS.preprod.indexer.includes('preprod.midnight.network'));
+  it('should contain expected network configurations for preview and preview', () => {
     assert.ok(NETWORK_CONFIGS.preview.indexer.includes('preview.midnight.network'));
-    assert.equal(NETWORK_CONFIGS.preprod.proofServer, 'http://127.0.0.1:6300');
+    assert.ok(NETWORK_CONFIGS.preview.indexer.includes('preview.midnight.network'));
+    assert.equal(NETWORK_CONFIGS.preview.proofServer, 'http://127.0.0.1:6300');
   });
 });

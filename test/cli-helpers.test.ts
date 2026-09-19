@@ -17,12 +17,12 @@ describe('CLI & Helper Functions', () => {
   it('should verify proof server configuration URLs for local and cloud environments', () => {
     assert.equal(NETWORK_CONFIGS.undeployed.proofServer, 'http://127.0.0.1:6300');
     assert.equal(NETWORK_CONFIGS.preview.proofServer, 'http://127.0.0.1:6300');
-    assert.equal(NETWORK_CONFIGS.preprod.proofServer, 'http://127.0.0.1:6300');
+    assert.equal(NETWORK_CONFIGS.preview.proofServer, 'http://127.0.0.1:6300');
   });
 
   it('should verify GraphQL indexer endpoint structures', () => {
-    assert.ok(NETWORK_CONFIGS.preprod.indexer.startsWith('https://'));
-    assert.ok(NETWORK_CONFIGS.preprod.indexerWS.startsWith('wss://'));
+    assert.ok(NETWORK_CONFIGS.preview.indexer.startsWith('https://'));
+    assert.ok(NETWORK_CONFIGS.preview.indexerWS.startsWith('wss://'));
     assert.ok(NETWORK_CONFIGS.undeployed.indexer.startsWith('http://'));
   });
 });
