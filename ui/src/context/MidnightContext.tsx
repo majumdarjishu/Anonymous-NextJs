@@ -32,11 +32,19 @@ const NETWORKS: Record<string, NetworkConfig> = {
     proofServer: 'http://localhost:6300',
     zkConfigPathUrl: '/contracts/managed/anonymous-membership-organisation',
   },
+  preview: {
+    name: 'Midnight Preview',
+    indexer: 'https://indexer.preview.midnight.network/api/v4/graphql',
+    indexerWS: 'wss://indexer.preview.midnight.network/api/v4/graphql/ws',
+    proofServer: 'http://localhost:6300',
+    zkConfigPathUrl: '/contracts/managed/anonymous-membership-organisation',
+  },
 };
 
 const CONTRACT_ADDRESS_STORAGE_KEY = 'midnight_contract_address';
 
 export type WalletStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
+export type TxStatus = 'idle' | 'submitting' | 'submitted' | 'confirming' | 'confirmed' | 'failed';
 
 interface MidnightContextType {
   walletAddress: string | null;
@@ -48,6 +56,8 @@ interface MidnightContextType {
   contractAddress: string | null;
   walletApi: any | null;
   hasShieldedAccount: boolean;
+  txStatus: TxStatus;
+  txError: string | null;
   deployContractAction: () => Promise<string>;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
@@ -138,7 +148,7 @@ function extractAddressString(raw: any): string | null {
     return null;
   }
   if (typeof raw === 'object') {
-    const knownKeys = ['address', 'shieldedAddress', 'bech32', 'value', 'addr', 'coinPublicKey'];
+    const knownKeys = ['address', 'unshieldedAddress', 'shieldedAddress', 'bech32', 'value', 'addr', 'coinPublicKey'];
     for (const k of knownKeys) {
       if (typeof raw[k] === 'string' && raw[k].length > 0) return raw[k];
     }
@@ -161,66 +171,57 @@ function extractAddressString(raw: any): string | null {
   return null;
 }
 
-/** Resolve shielded address from wallet API — works with both function and property APIs */
+/** Resolve unshielded address for UI display, and check if shielded account exists */
 async function resolveDisplayAddress(
   api: any,
   provider: any
 ): Promise<{ address: string; hasShielded: boolean }> {
-  // Log all available keys for debugging
-  const apiKeys = getAllKeys(api);
-  const providerKeys = getAllKeys(provider);
-  console.log('[wallet-connect] API keys:', apiKeys.join(', '));
-  console.log('[wallet-connect] Provider keys:', providerKeys.join(', '));
-  console.log('[wallet-connect] typeof api.state:', typeof api?.state);
-  console.log('[wallet-connect] typeof api.getShieldedAddresses:', typeof api?.getShieldedAddresses);
+  let displayAddress = 'no-unshielded-account';
+  let hasShielded = false;
 
-  const methodsToTry = [
-    'getShieldedAddresses',
-    'getShieldedAddress',
-    'shieldedAddresses',
-    'getAddresses',
-    'addresses',
-  ];
-
-  // Try on API object first, then on provider (some wallets keep methods on provider)
-  for (const obj of [api, provider]) {
-    for (const methodName of methodsToTry) {
-      try {
-        const raw = await callOrRead(obj, methodName);
-        if (raw === undefined) continue;
-        console.log(`[wallet-connect] ${methodName} on ${obj === api ? 'api' : 'provider'}:`,
-          JSON.stringify(raw, (_k, v) => v instanceof Uint8Array ? `Uint8Array(${v.length})` : v));
-        const addr = extractAddressString(raw);
-        if (addr) return { address: addr, hasShielded: true };
-      } catch (e) {
-        // ignore
+  // 1. Check for shielded keys (for contract functionality)
+  try {
+    const shieldedRaw = await callOrRead(api, 'getShieldedAddresses');
+    if (shieldedRaw) {
+      const target = Array.isArray(shieldedRaw) ? shieldedRaw[0] : shieldedRaw;
+      if (target && target.shieldedCoinPublicKey) {
+        hasShielded = true;
       }
     }
+  } catch (e) {
+    console.warn('[wallet-connect] Failed to check getShieldedAddresses:', e);
   }
 
-  // Try state() or state property on both objects
-  for (const [label, obj] of [['api', api], ['provider', provider]] as [string, any][]) {
-    try {
-      const state = await callOrRead(obj, 'state');
-      if (state === undefined) continue;
-      console.log(`[wallet-connect] state on ${label}:`,
-        JSON.stringify(state, (_k, v) => v instanceof Uint8Array ? `Uint8Array(${v.length})` : v));
-      if (state && typeof state === 'object') {
-        // Look for mn-prefixed string (Midnight shielded address)
-        for (const v of Object.values(state)) {
-          if (typeof v === 'string' && v.startsWith('mn') && v.length > 10)
-            return { address: v, hasShielded: true };
+  // 2. Get unshielded address for UI display (for tDUST)
+  const unshieldedMethods = ['getUnshieldedAddress', 'getUnshieldedAddresses', 'addresses'];
+  for (const obj of [api, provider]) {
+    for (const method of unshieldedMethods) {
+      try {
+        const raw = await callOrRead(obj, method);
+        const addr = extractAddressString(raw);
+        if (addr) {
+          displayAddress = addr;
+          break;
         }
-        // ServiceUriConfig guard: skip if it has indexer (network config, not account)
-        if (!state.indexer) {
-          const addr = state.address || state.coinPublicKey;
-          if (addr && typeof addr === 'string') return { address: addr, hasShielded: false };
+      } catch (e) {}
+    }
+    if (displayAddress !== 'no-unshielded-account') break;
+  }
+
+  // Fallback to state() if unshielded methods failed
+  if (displayAddress === 'no-unshielded-account') {
+    try {
+      const state = await callOrRead(api, 'state');
+      if (state && typeof state === 'object' && !state.indexer) {
+        const addr = state.unshieldedAddress || state.address;
+        if (addr && typeof addr === 'string') {
+          displayAddress = addr;
         }
       }
-    } catch (_) {}
+    } catch (e) {}
   }
 
-  return { address: 'no-shielded-account', hasShielded: false };
+  return { address: displayAddress, hasShielded };
 }
 
 export function MidnightProvider({ children }: { children: ReactNode }) {
@@ -231,15 +232,20 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [walletApi, setWalletApi] = useState<any | null>(null);
   const [hasShieldedAccount, setHasShieldedAccount] = useState(false);
+  const [txStatus, setTxStatus] = useState<TxStatus>('idle');
+  const [txError, setTxError] = useState<string | null>(null);
+  const [txHashRequest, setTxHashRequest] = useState<{ resolve: (hash: string) => void, reject: (err: Error) => void } | null>(null);
 
   const [contractAddress, setContractAddress] = useState<string | null>(
-    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef'
+    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || null
   );
 
   useEffect(() => {
     if (!contractAddress) {
       const saved = localStorage.getItem(CONTRACT_ADDRESS_STORAGE_KEY);
-      if (saved) setContractAddress(saved);
+      if (saved && saved !== 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef') {
+        setContractAddress(saved);
+      }
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -270,9 +276,23 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
         );
       }
 
-      const api = typeof detected.provider.connect === 'function'
-        ? await detected.provider.connect(envNetwork)
-        : await detected.provider.enable();
+      let api;
+      if (typeof detected.provider.connect === 'function') {
+        try {
+          api = await detected.provider.connect(envNetwork);
+        } catch (err: any) {
+          console.warn(`[wallet] connect('${envNetwork}') failed, falling back to enable():`, err);
+          if (typeof detected.provider.enable === 'function') {
+            api = await detected.provider.enable();
+          } else {
+            throw err;
+          }
+        }
+      } else if (typeof detected.provider.enable === 'function') {
+        api = await detected.provider.enable();
+      } else {
+        throw new Error('Wallet provider does not support connect() or enable().');
+      }
 
       if (!api) throw new Error('Wallet did not return an API. Authorization may have been rejected.');
 
@@ -298,26 +318,65 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
 
   const deployContractAction = useCallback(async () => {
     if (!walletApi) throw new Error('Wallet not fully connected');
+    if (!hasShieldedAccount) {
+      throw new Error('A shielded account is required to deploy contracts.');
+    }
+    
+    setTxStatus('submitting');
+    setTxError(null);
 
-    const { deployContract } = await import('@midnight-ntwrk/midnight-js-contracts');
-    const { createMidnightProviders, getCompiledContract, PRIVATE_STATE_ID } = await import('../lib/midnight');
-    const { fromHex } = await import('@midnight-ntwrk/midnight-js-utils');
+    try {
+      const { deployContract } = await import('@midnight-ntwrk/midnight-js-contracts');
+      const { createMidnightProviders, getCompiledContract, PRIVATE_STATE_ID } = await import('../lib/midnight');
+      const { fromHex } = await import('@midnight-ntwrk/midnight-js-utils');
 
-    const providers = await createMidnightProviders(walletApi, network);
-    const compiledContract = await getCompiledContract(network.zkConfigPathUrl);
+      const providers = await createMidnightProviders(walletApi, network, () => {
+        setTxStatus('submitted');
+        return new Promise((resolve, reject) => {
+          setTxHashRequest({ resolve, reject });
+        });
+      });
+      const compiledContract = await getCompiledContract(network.zkConfigPathUrl);
 
-    const deployed = await deployContract(providers, {
-      privateStateId: PRIVATE_STATE_ID,
-      initialPrivateState: {},
-      compiledContract: compiledContract as any,
-      args: [typeof providers.walletProvider.coinPublicKey === 'string' ? fromHex(providers.walletProvider.coinPublicKey as string) : providers.walletProvider.coinPublicKey],
-    });
-
-    const address = deployed.deployTxData.public.contractAddress;
-    localStorage.setItem(CONTRACT_ADDRESS_STORAGE_KEY, address);
-    setContractAddress(address);
-
-    return address;
+      // We don't set to 'confirming' here because deployContract will do proving and submitting internally.
+      // The txHashRequest will trigger 'submitted' right after submitTransaction resolves.
+      
+      let deployed: any;
+      try {
+        deployed = await deployContract(providers, {
+          privateStateId: PRIVATE_STATE_ID,
+          initialPrivateState: {},
+          compiledContract: compiledContract as any,
+          args: [typeof providers.walletProvider.coinPublicKey === 'string' ? fromHex(providers.walletProvider.coinPublicKey as string) : providers.walletProvider.coinPublicKey],
+        });
+      } catch (deployErr: any) {
+        // If deployment or signature is cancelled, we MUST clear the TxStatus!
+        setTxStatus('idle');
+        throw deployErr;
+      }
+      
+      console.log(`[Midnight] Deployment completed! Contract address: ${deployed.deployTxData.public.contractAddress}`);
+      const address = deployed.deployTxData.public.contractAddress;
+      localStorage.setItem(CONTRACT_ADDRESS_STORAGE_KEY, address);
+      setContractAddress(address);
+      
+      setTxStatus('confirmed');
+      setTimeout(() => setTxStatus('idle'), 5000);
+      
+      return address;
+    } catch (e: any) {
+      setTxStatus('failed');
+      const errMsg = e?.message || String(e);
+      setTxError(errMsg);
+      
+      if (errMsg.includes('A transaction is already pending')) {
+        const robustErrorMsg = 'A transaction is already pending in your 1AM wallet. To clear it: Open the 1AM extension, switch to Mainnet, then back to Preview. Or disconnect and reconnect.';
+        console.error(robustErrorMsg);
+        throw new Error(robustErrorMsg);
+      }
+      
+      throw e;
+    }
   }, [walletApi, network]);
 
   const disconnectWallet = useCallback(() => {
@@ -341,12 +400,56 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
       contractAddress,
       walletApi,
       hasShieldedAccount,
+      txStatus,
+      txError,
       deployContractAction,
       connectWallet,
       disconnectWallet,
       setContractAddressManually,
     }}>
       {children}
+      {txHashRequest && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100]">
+          <div className="bg-white p-6 rounded-2xl max-w-md w-full shadow-2xl mx-4 border border-brand-100">
+            <h3 className="text-xl font-bold text-slate-900 mb-3">Transaction Submitted!</h3>
+            <p className="text-sm text-slate-600 mb-4 leading-relaxed">
+              Your wallet has submitted the transaction, but it didn't return the Transaction ID automatically. 
+              To continue, please open your 1AM/Lace wallet, go to the <strong>Activity</strong> tab, copy the Transaction ID of the latest transaction, and paste it below:
+            </p>
+            <input 
+              type="text" 
+              id="tx-hash-input" 
+              className="w-full p-3 border border-slate-300 rounded-xl mb-6 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" 
+              placeholder="e.g. 8f4b...39a2" 
+              autoFocus
+            />
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => { 
+                  txHashRequest.reject(new Error('Transaction hash request cancelled by user')); 
+                  setTxHashRequest(null); 
+                }} 
+                className="px-5 py-2.5 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => { 
+                  const val = (document.getElementById('tx-hash-input') as HTMLInputElement).value;
+                  if (val && val.trim().length > 10) { 
+                    txHashRequest.resolve(val.trim()); 
+                    setTxHashRequest(null); 
+                    setTxStatus('confirming');
+                  }
+                }} 
+                className="px-5 py-2.5 text-sm font-bold text-white bg-brand-500 hover:bg-brand-600 rounded-xl shadow-lg shadow-brand-500/30 transition-all"
+              >
+                Confirm Deployment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </MidnightContext.Provider>
   );
 }

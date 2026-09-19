@@ -12,9 +12,9 @@ Enterprise Zero-Knowledge Organization Membership & Verification built natively 
 [![Live Video](https://img.shields.io/badge/YouTube-Live_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=D4IRcmAV-2Q)
 [![Live Deployment](https://img.shields.io/badge/Vercel-Live_Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://anonymous-organization-membership-n.vercel.app/)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/majumdarjishu/Anonymous-organization-membership-NextJs)
-[![Contract Address](https://img.shields.io/badge/Contract-c340a2b...610d-8A2BE2?style=for-the-badge&logo=polkadot&logoColor=white)](https://preview.midnightexplorer.com/contracts/c340a2b0427dc519342ee344a54b23651420413b35142442635d9eab9aae610d)
+[![Contract Address](https://img.shields.io/badge/Contract-f08cca5...3f1b-8A2BE2?style=for-the-badge&logo=polkadot&logoColor=white)](https://preview.midnightexplorer.com/contracts/f08cca551c180698e9e3a8b85ef6b192ac03f95350ec2bf38281b3219d193f1b)
 
-**Deployed Contract Address (Preview):** `c340a2b0427dc519342ee344a54b23651420413b35142442635d9eab9aae610d`
+**Deployed Contract Address (Preview):** `f08cca551c180698e9e3a8b85ef6b192ac03f95350ec2bf38281b3219d193f1b`
 
 ## 📸 Application Screenshots
 
@@ -139,8 +139,8 @@ NODE_OPTIONS="--max-old-space-size=12288" npm run deploy -- --network preprod
 
 Once deployed, create a `.env.local` inside the `ui/` folder:
 ```env
-NEXT_PUBLIC_MIDNIGHT_NETWORK=preprod
-NEXT_PUBLIC_CONTRACT_ADDRESS=c340a2b0427dc519342ee344a54b23651420413b35142442635d9eab9aae610d
+NEXT_PUBLIC_MIDNIGHT_NETWORK=preview
+NEXT_PUBLIC_CONTRACT_ADDRESS=f08cca551c180698e9e3a8b85ef6b192ac03f95350ec2bf38281b3219d193f1b
 ```
 
 ## ✅ Feature & Compliance Checklist
