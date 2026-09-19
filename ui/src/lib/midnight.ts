@@ -128,7 +128,7 @@ async function resolveShieldedKeys(walletApi: any): Promise<{ addressString: str
       for (const [k, v] of Object.entries(state)) {
         if (typeof v === 'string' && v.startsWith('mn') && v.length > 10) {
           console.log(`[Midnight] Found shielded address in state.${k}`);
-          return { addressString: v, coinPublicKey: new Uint8Array(32), encryptionPublicKey: new Uint8Array(32) };
+          return { addressString: v, coinPublicKeyString: "", encryptionPublicKeyString: "" };
         }
       }
     }
@@ -186,11 +186,12 @@ export const createMidnightProviders = async (
       }
       
       // Use the static codec to decode since ShieldedCoinPublicKey doesn't expose [Bech32mSymbol]
-      coinPublicKey = ShieldedCoinPublicKey.codec.decode(networkId, parsedCpk).data;
-      encryptionPublicKey = ShieldedEncryptionPublicKey.codec.decode(networkId, parsedEpk).data;
+      // Wrap in new Uint8Array to satisfy strict Typescript Buffer vs Uint8Array ArrayBuffer constraints
+      coinPublicKey = new Uint8Array(ShieldedCoinPublicKey.codec.decode(networkId, parsedCpk).data);
+      encryptionPublicKey = new Uint8Array(ShieldedEncryptionPublicKey.codec.decode(networkId, parsedEpk).data);
     } else {
-      coinPublicKey = fromHex(cPkStr);
-      encryptionPublicKey = fromHex(ePkStr);
+      coinPublicKey = new Uint8Array(fromHex(cPkStr));
+      encryptionPublicKey = new Uint8Array(fromHex(ePkStr));
     }
   } catch (err: any) {
     console.warn('[Midnight] Failed to parse key:', err?.message);
