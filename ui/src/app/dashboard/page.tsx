@@ -164,7 +164,7 @@ export default function DashboardPage() {
             { label: 'Wallet', ok: status === 'connected', value: status === 'connected' ? `Connected (${walletName})` : 'Not connected' },
             { label: 'Network', ok: true, value: network.name },
             { label: 'Contract', ok: true, value: 'Anonymous Membership (Compiled)' },
-            { label: 'Contract Address', ok: !!deployedAddress, value: deployedAddress ? `${deployedAddress.slice(0, 16)}…` : 'Not deployed' },
+            { label: 'Contract Address', ok: !!deployedAddress, value: deployedAddress ? <span className="break-all text-[11px] leading-tight block mt-1">{deployedAddress}</span> : 'Not deployed' },
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-0">
               <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${item.ok ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-amber-500 shadow-[0_0_8px_#f59e0b]'}`} />
@@ -174,32 +174,7 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Deployment UI */}
-        {!deployedAddress && status === 'connected' && (
-          <div className="mt-6 p-4 border border-brand-200 bg-brand-50 rounded-xl">
-            <h3 className="text-sm font-bold text-slate-900 mb-2">Contract Not Deployed</h3>
-            <p className="text-xs text-slate-600 mb-4">You need to deploy the membership contract to the network before you can interact with it.</p>
-            <button
-              onClick={async () => {
-                try {
-                  const addr = await deployContractAction();
-                  setDeployedAddress(addr);
-                } catch (err) {
-                  console.error(err);
-                }
-              }}
-              disabled={txStatus !== 'idle' && txStatus !== 'failed' && txStatus !== 'confirmed'}
-              className="w-full sm:w-auto px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold rounded-lg shadow disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {(txStatus === 'submitting' || txStatus === 'submitted' || txStatus === 'confirming') ? (
-                <><Loader2 size={16} className="animate-spin" /> {txStatus.charAt(0).toUpperCase() + txStatus.slice(1)}...</>
-              ) : txStatus === 'confirmed' ? (
-                <><Check size={16} /> Deployed!</>
-              ) : 'Deploy Contract'}
-            </button>
-            {txError && <p className="text-xs text-red-500 mt-3 whitespace-pre-wrap font-medium">{txError}</p>}
-          </div>
-        )}
+
       </div>
     </div>
   );

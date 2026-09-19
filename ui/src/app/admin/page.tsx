@@ -6,11 +6,9 @@ import { Shield, Lock, Activity, UserPlus, CheckCircle, AlertCircle, Rocket, Cop
 import { motion } from 'framer-motion';
 
 export default function AdminPage() {
-  const { status, walletAddress, deployContractAction, contractAddress, setContractAddressManually } = useMidnight();
+  const { status, walletAddress, contractAddress, setContractAddressManually } = useMidnight();
   const [commitmentInput, setCommitmentInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeploying, setIsDeploying] = useState(false);
-  const [deployResult, setDeployResult] = useState<{ status: 'success' | 'failure'; address?: string; message?: string } | null>(null);
   const [result, setResult] = useState<{ status: 'success' | 'failure'; txHash?: string; message?: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const [manualAddress, setManualAddress] = useState('');
@@ -58,21 +56,6 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeployContract = async () => {
-    setIsDeploying(true);
-    setDeployResult(null);
-    try {
-      const address = await deployContractAction();
-      setDeployResult({ status: 'success', address });
-    } catch (err: any) {
-      console.error(err);
-      // Show multiline errors nicely
-      const msg = err?.message || 'Deployment failed.';
-      setDeployResult({ status: 'failure', message: msg });
-    } finally {
-      setIsDeploying(false);
-    }
-  };
 
   const handleCopyAddress = (addr: string) => {
     navigator.clipboard.writeText(addr).then(() => {
@@ -181,40 +164,8 @@ export default function AdminPage() {
               ) : (
                 <div>
                   <p className="text-xs text-slate-600 mb-4">
-                    The Smart Contract is not connected. Deploy it via your wallet, or paste an existing address below.
+                    The Smart Contract is not configured. Please set the <code className="bg-slate-200 px-1 rounded">NEXT_PUBLIC_CONTRACT_ADDRESS</code> environment variable to your deployed contract ID, or paste it below.
                   </p>
-                  <button 
-                    onClick={handleDeployContract}
-                    disabled={isDeploying}
-                    className="w-full btn-primary py-3 text-sm flex items-center justify-center disabled:opacity-50"
-                  >
-                    <Rocket className="w-4 h-4 mr-2" />
-                    {isDeploying ? 'Deploying via Lace...' : 'Deploy Contract'}
-                  </button>
-                  
-                  {deployResult && (
-                    <div className={`mt-4 p-3 rounded-xl border text-sm ${deployResult.status === 'success' ? 'bg-emerald-900/20 border-emerald-500/30 text-emerald-400' : 'bg-red-900/20 border-red-500/30 text-red-400'}`}>
-                      {deployResult.status === 'success' ? (
-                        <>
-                          <p className="font-bold mb-1">Deployment Successful!</p>
-                          <div className="bg-emerald-50 border border-emerald-200 rounded p-2 flex items-start gap-2 mb-2">
-                            <p className="font-mono text-xs text-emerald-800 break-all flex-1">{deployResult.address}</p>
-                            <button onClick={() => handleCopyAddress(deployResult.address!)} className="flex-shrink-0">
-                              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-emerald-600" />}
-                            </button>
-                          </div>
-                          <p className="text-xs text-emerald-700">
-                            Address saved to your browser. Set <code className="bg-emerald-500/10 px-1 rounded">NEXT_PUBLIC_CONTRACT_ADDRESS</code> in Vercel env vars for persistence.
-                          </p>
-                        </>
-                      ) : (
-                        <div>
-                          <p className="font-bold mb-1">Deployment Failed</p>
-                          <p className="whitespace-pre-line text-xs">{deployResult.message}</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
               )}
 
