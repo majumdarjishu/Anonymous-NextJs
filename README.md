@@ -10,7 +10,7 @@ Enterprise Zero-Knowledge Organization Membership & Verification built natively 
 ## 🔗 Links
 
 [![Live Video](https://img.shields.io/badge/YouTube-Live_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=D4IRcmAV-2Q)
-[![Live Deployment](https://img.shields.io/badge/Vercel-Live_Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://anonymous-organization-membership-n.vercel.app/)
+[![Live Deployment](https://img.shields.io/badge/Vercel-Live_Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://anonymous-next-js.vercel.app/)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/majumdarjishu/Anonymous-NextJs)
 [![Contract Address](https://img.shields.io/badge/Contract-f08cca5...3f1b-8A2BE2?style=for-the-badge&logo=polkadot&logoColor=white)](https://preview.midnightexplorer.com/contracts/f08cca551c180698e9e3a8b85ef6b192ac03f95350ec2bf38281b3219d193f1b)
 
