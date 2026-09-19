@@ -88,12 +88,12 @@ function detectMidnightWallet(): { provider: any; name: string; key: string } | 
     }
   }
 
-  for (const key of Object.keys(w.midnight)) {
+  for (const key of getAllKeys(w.midnight)) {
     const p = w.midnight[key];
     if (p && (typeof p.enable === 'function' || typeof p.connect === 'function')) {
-      const name = (typeof p.name === 'string' && p.name.trim()) ? p.name.trim() : formatWalletKeyName(key);
-      console.log(`[wallet] Detected via fallback key "${key}": ${name}`);
-      return { provider: p, name, key };
+      const name = (typeof p.name === 'string' && p.name.trim()) ? p.name.trim() : formatWalletKeyName(String(key));
+      console.log(`[wallet] Detected via fallback key "${String(key)}": ${name}`);
+      return { provider: p, name, key: String(key) };
     }
   }
 
@@ -271,7 +271,7 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
       }
 
       const api = typeof detected.provider.connect === 'function'
-        ? await detected.provider.connect()
+        ? await detected.provider.connect(envNetwork)
         : await detected.provider.enable();
 
       if (!api) throw new Error('Wallet did not return an API. Authorization may have been rejected.');
@@ -308,12 +308,7 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
 
     const deployed = await deployContract(providers, {
       privateStateId: PRIVATE_STATE_ID,
-      initialPrivateState: {
-        credential: () => ({
-          secret: new Uint8Array(32),
-          membershipId: 0n
-        })
-      },
+      initialPrivateState: {},
       compiledContract: compiledContract as any,
       args: [typeof providers.walletProvider.coinPublicKey === 'string' ? fromHex(providers.walletProvider.coinPublicKey as string) : providers.walletProvider.coinPublicKey],
     });
