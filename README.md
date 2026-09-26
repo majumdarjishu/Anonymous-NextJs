@@ -12,9 +12,9 @@ Enterprise Zero-Knowledge Organization Membership & Verification built natively 
 [![Live Video](https://img.shields.io/badge/YouTube-Live_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/G7Z6OibcQOw)
 [![Live Deployment](https://img.shields.io/badge/Vercel-Live_Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://anonymous-next-js.vercel.app/)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/majumdarjishu/Anonymous-NextJs)
-[![Contract Address](https://img.shields.io/badge/Contract-f08cca5...3f1b-8A2BE2?style=for-the-badge&logo=polkadot&logoColor=white)](https://preview.midnightexplorer.com/contracts/f08cca551c180698e9e3a8b85ef6b192ac03f95350ec2bf38281b3219d193f1b)
+[![Contract Address](https://img.shields.io/badge/Contract-970278c...b936-8A2BE2?style=for-the-badge&logo=polkadot&logoColor=white)](https://preview.midnightexplorer.com/contracts/970278c8167eabcf63589bdd447893007295f19269da48c3c6d869ee20bfb936)
 
-**Deployed Contract Address (Preview):** `f08cca551c180698e9e3a8b85ef6b192ac03f95350ec2bf38281b3219d193f1b`
+**Deployed Contract Address (Preview):** `970278c8167eabcf63589bdd447893007295f19269da48c3c6d869ee20bfb936`
 
 ## 📸 Application Screenshots
 
@@ -37,6 +37,7 @@ Anonymous Organization Membership enables members to mathematically prove their 
 - No passcodes or credentials ever leave the member's local device.
 - No wallet identities or personal identifiable information (PII) are published on-chain.
 - The Midnight ledger verifies the cryptographic proof, increments the aggregate verification counter, and records a one-way commitment hash.
+- **NEW: Action-Scoped Nullifiers**: Members can verify their identity multiple times for distinct actions (e.g., voting on different proposals) without their identity being linked across actions. This is achieved by scoping the cryptographic nullifier to both the member's secret and the specific `actionId`.
 
 ## ⚙️ Working Principles & Cryptographic Flow
 
@@ -83,6 +84,7 @@ The platform leverages Midnight's dual-state architecture where private witness 
 | **Member Identity** | 🔒 Private | Off-Chain | Zero wallet-to-organization correlation on public ledger |
 | **Verification Counter** | 🌐 Public | Midnight Ledger | Aggregate counter tracking verified members |
 | **Commitment Hash** | 🌐 Public | Midnight Ledger | One-way cryptographic fingerprint |
+| **Action Nullifier** | 🌐 Public | Midnight Ledger | Action-scoped fingerprint preventing double-actions without linking identities |
 | **Admin Key** | 🌐 Public | Midnight Ledger | Active organization admin identifier |
 
 ## 📖 Step-by-Step Developer & Operator Guide
@@ -140,7 +142,7 @@ NODE_OPTIONS="--max-old-space-size=12288" npm run deploy -- --network preview
 Once deployed, create a `.env.local` inside the `ui/` folder:
 ```env
 NEXT_PUBLIC_MIDNIGHT_NETWORK=preview
-NEXT_PUBLIC_CONTRACT_ADDRESS=f08cca551c180698e9e3a8b85ef6b192ac03f95350ec2bf38281b3219d193f1b
+NEXT_PUBLIC_CONTRACT_ADDRESS=970278c8167eabcf63589bdd447893007295f19269da48c3c6d869ee20bfb936
 ```
 
 ## ✅ Feature & Compliance Checklist

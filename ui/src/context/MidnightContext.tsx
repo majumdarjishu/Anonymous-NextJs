@@ -231,7 +231,7 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
   const [txHashRequest, setTxHashRequest] = useState<{ resolve: (hash: string) => void, reject: (err: Error) => void } | null>(null);
 
   const [contractAddress, setContractAddress] = useState<string | null>(
-    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || 'f08cca551c180698e9e3a8b85ef6b192ac03f95350ec2bf38281b3219d193f1b'
+    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '970278c8167eabcf63589bdd447893007295f19269da48c3c6d869ee20bfb936'
   );
 
   useEffect(() => {

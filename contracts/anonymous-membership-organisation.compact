@@ -52,18 +52,30 @@ export circuit transferAdmin(newAdmin: Bytes<32>): [] {
     admin = disclose(newAdmin);
 }
 
+struct ActionNullifier {
+    secret: Bytes<32>,
+    actionId: Bytes<32>
+}
+
 // Any user can anonymously verify their membership using their private credential
-export circuit verifyMembership(): [] {
+// for a specific action (e.g., voting on a proposal, accessing a specific resource).
+export circuit verifyMembership(actionId: Bytes<32>): [] {
     const commitment = disclose(persistentHash<MembershipCredential>(credential()));
     
     // Member must be registered AND actively valid (not revoked)
     assert(memberCommitments.member(commitment), "Membership commitment not found");
     assert(memberCommitments.lookup(commitment), "Membership has been revoked");
     
-    // Create a unique nullifier derived from the secret alone to avoid correlating with the commitment hash
-    // Ensure this nullifier hasn't already verified
-    const nullifier = disclose(persistentHash<Bytes<32>>(credential().secret));
-    assert(!verifiedMembers.member(nullifier), "Membership already verified");
+    // Create a unique nullifier derived from the secret AND the actionId.
+    // This prevents double-verification for the SAME action, but allows the 
+    // member to verify anonymously for DIFFERENT actions without correlation.
+    const nullifierData = ActionNullifier { 
+        secret: credential().secret, 
+        actionId: actionId 
+    };
+    const nullifier = disclose(persistentHash<ActionNullifier>(nullifierData));
+    
+    assert(!verifiedMembers.member(nullifier), "Membership already verified for this action");
     
     // Record verification and increment counter
     verifiedMembers.insert(nullifier, true);

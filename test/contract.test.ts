@@ -40,7 +40,7 @@ describe('Compact Smart Contract Verification', () => {
     assert.match(content, /export circuit registerMembership\(commitment:\s*Bytes<32>\):\s*\[\]/, 'Must export circuit registerMembership');
     assert.match(content, /export circuit revokeMembership\(commitment:\s*Bytes<32>\):\s*\[\]/, 'Must export circuit revokeMembership');
     assert.match(content, /export circuit transferAdmin\(newAdmin:\s*Bytes<32>\):\s*\[\]/, 'Must export circuit transferAdmin');
-    assert.match(content, /export circuit verifyMembership\(\):\s*\[\]/, 'Must export circuit verifyMembership');
+    assert.match(content, /export circuit verifyMembership\(actionId:\s*Bytes<32>\):\s*\[\]/, 'Must export circuit verifyMembership with actionId');
   });
 
   it('should verify compiled contract output folder structure', { skip: !fs.existsSync(path.join(rootDir, 'contracts', 'managed', 'anonymous-membership-organisation')) ? 'contracts/managed/ not present — run `npm run compile` with the Compact toolchain first' : false }, () => {
