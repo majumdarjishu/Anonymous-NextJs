@@ -106,14 +106,14 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('registerMembership',
                                      'argument 1 (as invoked from Typescript)',
-                                     'anonymous-membership-organisation.compact line 23 char 1',
+                                     'anonymous-membership-organisation.compact line 24 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(commitment_0.buffer instanceof ArrayBuffer && commitment_0.BYTES_PER_ELEMENT === 1 && commitment_0.length === 32)) {
           __compactRuntime.typeError('registerMembership',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'anonymous-membership-organisation.compact line 23 char 1',
+                                     'anonymous-membership-organisation.compact line 24 char 1',
                                      'Bytes<32>',
                                      commitment_0)
         }
@@ -142,14 +142,14 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('revokeMembership',
                                      'argument 1 (as invoked from Typescript)',
-                                     'anonymous-membership-organisation.compact line 29 char 1',
+                                     'anonymous-membership-organisation.compact line 38 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(commitment_0.buffer instanceof ArrayBuffer && commitment_0.BYTES_PER_ELEMENT === 1 && commitment_0.length === 32)) {
           __compactRuntime.typeError('revokeMembership',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'anonymous-membership-organisation.compact line 29 char 1',
+                                     'anonymous-membership-organisation.compact line 38 char 1',
                                      'Bytes<32>',
                                      commitment_0)
         }
@@ -169,6 +169,42 @@ export class Contract {
         partialProofData.output = { value: [], alignment: [] };
         return { result: result_0, context: context, proofData: partialProofData, gasCost: context.gasCost };
       },
+      transferAdmin: (...args_1) => {
+        if (args_1.length !== 2) {
+          throw new __compactRuntime.CompactError(`transferAdmin: expected 2 arguments (as invoked from Typescript), received ${args_1.length}`);
+        }
+        const contextOrig_0 = args_1[0];
+        const newAdmin_0 = args_1[1];
+        if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
+          __compactRuntime.typeError('transferAdmin',
+                                     'argument 1 (as invoked from Typescript)',
+                                     'anonymous-membership-organisation.compact line 50 char 1',
+                                     'CircuitContext',
+                                     contextOrig_0)
+        }
+        if (!(newAdmin_0.buffer instanceof ArrayBuffer && newAdmin_0.BYTES_PER_ELEMENT === 1 && newAdmin_0.length === 32)) {
+          __compactRuntime.typeError('transferAdmin',
+                                     'argument 1 (argument 2 as invoked from Typescript)',
+                                     'anonymous-membership-organisation.compact line 50 char 1',
+                                     'Bytes<32>',
+                                     newAdmin_0)
+        }
+        const context = { ...contextOrig_0, gasCost: __compactRuntime.emptyRunningCost() };
+        const partialProofData = {
+          input: {
+            value: _descriptor_0.toValue(newAdmin_0),
+            alignment: _descriptor_0.alignment()
+          },
+          output: undefined,
+          publicTranscript: [],
+          privateTranscriptOutputs: []
+        };
+        const result_0 = this._transferAdmin_0(context,
+                                               partialProofData,
+                                               newAdmin_0);
+        partialProofData.output = { value: [], alignment: [] };
+        return { result: result_0, context: context, proofData: partialProofData, gasCost: context.gasCost };
+      },
       verifyMembership: (...args_1) => {
         if (args_1.length !== 1) {
           throw new __compactRuntime.CompactError(`verifyMembership: expected 1 argument (as invoked from Typescript), received ${args_1.length}`);
@@ -177,7 +213,7 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('verifyMembership',
                                      'argument 1 (as invoked from Typescript)',
-                                     'anonymous-membership-organisation.compact line 35 char 1',
+                                     'anonymous-membership-organisation.compact line 56 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
@@ -196,11 +232,13 @@ export class Contract {
     this.impureCircuits = {
       registerMembership: this.circuits.registerMembership,
       revokeMembership: this.circuits.revokeMembership,
+      transferAdmin: this.circuits.transferAdmin,
       verifyMembership: this.circuits.verifyMembership
     };
     this.provableCircuits = {
       registerMembership: this.circuits.registerMembership,
       revokeMembership: this.circuits.revokeMembership,
+      transferAdmin: this.circuits.transferAdmin,
       verifyMembership: this.circuits.verifyMembership
     };
   }
@@ -225,7 +263,7 @@ export class Contract {
     if (!(adminKey_0.buffer instanceof ArrayBuffer && adminKey_0.BYTES_PER_ELEMENT === 1 && adminKey_0.length === 32)) {
       __compactRuntime.typeError('Contract state constructor',
                                  'argument 1 (argument 2 as invoked from Typescript)',
-                                 'anonymous-membership-organisation.compact line 10 char 1',
+                                 'anonymous-membership-organisation.compact line 11 char 1',
                                  'Bytes<32>',
                                  adminKey_0)
     }
@@ -235,9 +273,11 @@ export class Contract {
     stateValue_0 = stateValue_0.arrayPush(__compactRuntime.StateValue.newNull());
     stateValue_0 = stateValue_0.arrayPush(__compactRuntime.StateValue.newNull());
     stateValue_0 = stateValue_0.arrayPush(__compactRuntime.StateValue.newNull());
+    stateValue_0 = stateValue_0.arrayPush(__compactRuntime.StateValue.newNull());
     state_0.data = new __compactRuntime.ChargedState(stateValue_0);
     state_0.setOperation('registerMembership', new __compactRuntime.ContractOperation());
     state_0.setOperation('revokeMembership', new __compactRuntime.ContractOperation());
+    state_0.setOperation('transferAdmin', new __compactRuntime.ContractOperation());
     state_0.setOperation('verifyMembership', new __compactRuntime.ContractOperation());
     const context = __compactRuntime.createCircuitContext(__compactRuntime.dummyContractAddress(), constructorContext_0.initialZswapLocalState.coinPublicKey, state_0.data, constructorContext_0.initialPrivateState);
     const partialProofData = {
@@ -292,6 +332,16 @@ export class Contract {
                                       partialProofData,
                                       [
                                        { push: { storage: false,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_10.toValue(4n),
+                                                                                              alignment: _descriptor_10.alignment() }).encode() } },
+                                       { push: { storage: true,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_6.toValue(0n),
+                                                                                              alignment: _descriptor_6.alignment() }).encode() } },
+                                       { ins: { cached: false, n: 1 } }]);
+    __compactRuntime.queryLedgerState(context,
+                                      partialProofData,
+                                      [
+                                       { push: { storage: false,
                                                  value: __compactRuntime.StateValue.newCell({ value: _descriptor_10.toValue(0n),
                                                                                               alignment: _descriptor_10.alignment() }).encode() } },
                                        { push: { storage: true,
@@ -306,11 +356,11 @@ export class Contract {
     }
   }
   _persistentHash_0(value_0) {
-    const result_0 = __compactRuntime.persistentHash(_descriptor_0, value_0);
+    const result_0 = __compactRuntime.persistentHash(_descriptor_5, value_0);
     return result_0;
   }
   _persistentHash_1(value_0) {
-    const result_0 = __compactRuntime.persistentHash(_descriptor_5, value_0);
+    const result_0 = __compactRuntime.persistentHash(_descriptor_0, value_0);
     return result_0;
   }
   _ownPublicKey_0(context, partialProofData) {
@@ -328,7 +378,7 @@ export class Contract {
     if (!(typeof(result_0) === 'object' && result_0.secret.buffer instanceof ArrayBuffer && result_0.secret.BYTES_PER_ELEMENT === 1 && result_0.secret.length === 32 && typeof(result_0.membershipId) === 'bigint' && result_0.membershipId >= 0n && result_0.membershipId <= 4294967295n)) {
       __compactRuntime.typeError('credential',
                                  'return value',
-                                 'anonymous-membership-organisation.compact line 20 char 1',
+                                 'anonymous-membership-organisation.compact line 21 char 1',
                                  'struct MembershipCredential<secret: Bytes<32>, membershipId: Uint<0..4294967296>>',
                                  result_0)
     }
@@ -354,6 +404,43 @@ export class Contract {
                                           this._ownPublicKey_0(context,
                                                                partialProofData).bytes),
                             'Only admin can register members');
+    const isRegistered_0 = _descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
+                                                                                     partialProofData,
+                                                                                     [
+                                                                                      { dup: { n: 0 } },
+                                                                                      { idx: { cached: false,
+                                                                                               pushPath: false,
+                                                                                               path: [
+                                                                                                      { tag: 'value',
+                                                                                                        value: { value: _descriptor_10.toValue(1n),
+                                                                                                                 alignment: _descriptor_10.alignment() } }] } },
+                                                                                      { push: { storage: false,
+                                                                                                value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(commitment_0),
+                                                                                                                                             alignment: _descriptor_0.alignment() }).encode() } },
+                                                                                      'member',
+                                                                                      { popeq: { cached: true,
+                                                                                                 result: undefined } }]).value);
+    if (isRegistered_0) {
+      __compactRuntime.assert(!_descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
+                                                                                         partialProofData,
+                                                                                         [
+                                                                                          { dup: { n: 0 } },
+                                                                                          { idx: { cached: false,
+                                                                                                   pushPath: false,
+                                                                                                   path: [
+                                                                                                          { tag: 'value',
+                                                                                                            value: { value: _descriptor_10.toValue(1n),
+                                                                                                                     alignment: _descriptor_10.alignment() } }] } },
+                                                                                          { idx: { cached: false,
+                                                                                                   pushPath: false,
+                                                                                                   path: [
+                                                                                                          { tag: 'value',
+                                                                                                            value: { value: _descriptor_0.toValue(commitment_0),
+                                                                                                                     alignment: _descriptor_0.alignment() } }] } },
+                                                                                          { popeq: { cached: false,
+                                                                                                     result: undefined } }]).value),
+                              'Member already registered and active');
+    }
     __compactRuntime.queryLedgerState(context,
                                       partialProofData,
                                       [
@@ -370,6 +457,22 @@ export class Contract {
                                                  value: __compactRuntime.StateValue.newCell({ value: _descriptor_1.toValue(true),
                                                                                               alignment: _descriptor_1.alignment() }).encode() } },
                                        { ins: { cached: false, n: 1 } },
+                                       { ins: { cached: true, n: 1 } }]);
+    const tmp_0 = 1n;
+    __compactRuntime.queryLedgerState(context,
+                                      partialProofData,
+                                      [
+                                       { idx: { cached: false,
+                                                pushPath: true,
+                                                path: [
+                                                       { tag: 'value',
+                                                         value: { value: _descriptor_10.toValue(4n),
+                                                                  alignment: _descriptor_10.alignment() } }] } },
+                                       { addi: { immediate: parseInt(__compactRuntime.valueToBigInt(
+                                                              { value: _descriptor_2.toValue(tmp_0),
+                                                                alignment: _descriptor_2.alignment() }
+                                                                .value
+                                                            )) } },
                                        { ins: { cached: true, n: 1 } }]);
     return [];
   }
@@ -389,6 +492,42 @@ export class Contract {
                                           this._ownPublicKey_0(context,
                                                                partialProofData).bytes),
                             'Only admin can revoke members');
+    __compactRuntime.assert(_descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
+                                                                                      partialProofData,
+                                                                                      [
+                                                                                       { dup: { n: 0 } },
+                                                                                       { idx: { cached: false,
+                                                                                                pushPath: false,
+                                                                                                path: [
+                                                                                                       { tag: 'value',
+                                                                                                         value: { value: _descriptor_10.toValue(1n),
+                                                                                                                  alignment: _descriptor_10.alignment() } }] } },
+                                                                                       { push: { storage: false,
+                                                                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(commitment_0),
+                                                                                                                                              alignment: _descriptor_0.alignment() }).encode() } },
+                                                                                       'member',
+                                                                                       { popeq: { cached: true,
+                                                                                                  result: undefined } }]).value),
+                            'Member commitment not found');
+    __compactRuntime.assert(_descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
+                                                                                      partialProofData,
+                                                                                      [
+                                                                                       { dup: { n: 0 } },
+                                                                                       { idx: { cached: false,
+                                                                                                pushPath: false,
+                                                                                                path: [
+                                                                                                       { tag: 'value',
+                                                                                                         value: { value: _descriptor_10.toValue(1n),
+                                                                                                                  alignment: _descriptor_10.alignment() } }] } },
+                                                                                       { idx: { cached: false,
+                                                                                                pushPath: false,
+                                                                                                path: [
+                                                                                                       { tag: 'value',
+                                                                                                         value: { value: _descriptor_0.toValue(commitment_0),
+                                                                                                                  alignment: _descriptor_0.alignment() } }] } },
+                                                                                       { popeq: { cached: false,
+                                                                                                  result: undefined } }]).value),
+                            'Member is already revoked');
     __compactRuntime.queryLedgerState(context,
                                       partialProofData,
                                       [
@@ -406,13 +545,94 @@ export class Contract {
                                                                                               alignment: _descriptor_1.alignment() }).encode() } },
                                        { ins: { cached: false, n: 1 } },
                                        { ins: { cached: true, n: 1 } }]);
+    const tmp_0 = 1n;
+    __compactRuntime.queryLedgerState(context,
+                                      partialProofData,
+                                      [
+                                       { idx: { cached: false,
+                                                pushPath: true,
+                                                path: [
+                                                       { tag: 'value',
+                                                         value: { value: _descriptor_10.toValue(4n),
+                                                                  alignment: _descriptor_10.alignment() } }] } },
+                                       { subi: { immediate: parseInt(__compactRuntime.valueToBigInt(
+                                                              { value: _descriptor_2.toValue(tmp_0),
+                                                                alignment: _descriptor_2.alignment() }
+                                                                .value
+                                                            )) } },
+                                       { ins: { cached: true, n: 1 } }]);
+    return [];
+  }
+  _transferAdmin_0(context, partialProofData, newAdmin_0) {
+    __compactRuntime.assert(this._equal_2(_descriptor_0.fromValue(__compactRuntime.queryLedgerState(context,
+                                                                                                    partialProofData,
+                                                                                                    [
+                                                                                                     { dup: { n: 0 } },
+                                                                                                     { idx: { cached: false,
+                                                                                                              pushPath: false,
+                                                                                                              path: [
+                                                                                                                     { tag: 'value',
+                                                                                                                       value: { value: _descriptor_10.toValue(0n),
+                                                                                                                                alignment: _descriptor_10.alignment() } }] } },
+                                                                                                     { popeq: { cached: false,
+                                                                                                                result: undefined } }]).value),
+                                          this._ownPublicKey_0(context,
+                                                               partialProofData).bytes),
+                            'Only current admin can transfer administration');
+    __compactRuntime.queryLedgerState(context,
+                                      partialProofData,
+                                      [
+                                       { push: { storage: false,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_10.toValue(0n),
+                                                                                              alignment: _descriptor_10.alignment() }).encode() } },
+                                       { push: { storage: true,
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(newAdmin_0),
+                                                                                              alignment: _descriptor_0.alignment() }).encode() } },
+                                       { ins: { cached: false, n: 1 } }]);
     return [];
   }
   _verifyMembership_0(context, partialProofData) {
-    let tmp_0;
-    __compactRuntime.assert((tmp_0 = this._persistentHash_1(this._credential_0(context,
-                                                                               partialProofData)),
-                             _descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
+    const commitment_0 = this._persistentHash_0(this._credential_0(context,
+                                                                   partialProofData));
+    __compactRuntime.assert(_descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
+                                                                                      partialProofData,
+                                                                                      [
+                                                                                       { dup: { n: 0 } },
+                                                                                       { idx: { cached: false,
+                                                                                                pushPath: false,
+                                                                                                path: [
+                                                                                                       { tag: 'value',
+                                                                                                         value: { value: _descriptor_10.toValue(1n),
+                                                                                                                  alignment: _descriptor_10.alignment() } }] } },
+                                                                                       { push: { storage: false,
+                                                                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(commitment_0),
+                                                                                                                                              alignment: _descriptor_0.alignment() }).encode() } },
+                                                                                       'member',
+                                                                                       { popeq: { cached: true,
+                                                                                                  result: undefined } }]).value),
+                            'Membership commitment not found');
+    __compactRuntime.assert(_descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
+                                                                                      partialProofData,
+                                                                                      [
+                                                                                       { dup: { n: 0 } },
+                                                                                       { idx: { cached: false,
+                                                                                                pushPath: false,
+                                                                                                path: [
+                                                                                                       { tag: 'value',
+                                                                                                         value: { value: _descriptor_10.toValue(1n),
+                                                                                                                  alignment: _descriptor_10.alignment() } }] } },
+                                                                                       { idx: { cached: false,
+                                                                                                pushPath: false,
+                                                                                                path: [
+                                                                                                       { tag: 'value',
+                                                                                                         value: { value: _descriptor_0.toValue(commitment_0),
+                                                                                                                  alignment: _descriptor_0.alignment() } }] } },
+                                                                                       { popeq: { cached: false,
+                                                                                                  result: undefined } }]).value),
+                            'Membership has been revoked');
+    const nullifier_0 = this._persistentHash_1(this._credential_0(context,
+                                                                  partialProofData).secret);
+    __compactRuntime.assert(!_descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
                                                                                        partialProofData,
                                                                                        [
                                                                                         { dup: { n: 0 } },
@@ -420,37 +640,15 @@ export class Contract {
                                                                                                  pushPath: false,
                                                                                                  path: [
                                                                                                         { tag: 'value',
-                                                                                                          value: { value: _descriptor_10.toValue(1n),
+                                                                                                          value: { value: _descriptor_10.toValue(2n),
                                                                                                                    alignment: _descriptor_10.alignment() } }] } },
                                                                                         { push: { storage: false,
-                                                                                                  value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(tmp_0),
+                                                                                                  value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(nullifier_0),
                                                                                                                                                alignment: _descriptor_0.alignment() }).encode() } },
                                                                                         'member',
                                                                                         { popeq: { cached: true,
-                                                                                                   result: undefined } }]).value)),
-                            'Membership commitment not found');
-    let tmp_1;
-    __compactRuntime.assert(!(tmp_1 = this._persistentHash_0(this._credential_0(context,
-                                                                                partialProofData).secret),
-                              _descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
-                                                                                        partialProofData,
-                                                                                        [
-                                                                                         { dup: { n: 0 } },
-                                                                                         { idx: { cached: false,
-                                                                                                  pushPath: false,
-                                                                                                  path: [
-                                                                                                         { tag: 'value',
-                                                                                                           value: { value: _descriptor_10.toValue(2n),
-                                                                                                                    alignment: _descriptor_10.alignment() } }] } },
-                                                                                         { push: { storage: false,
-                                                                                                   value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(tmp_1),
-                                                                                                                                                alignment: _descriptor_0.alignment() }).encode() } },
-                                                                                         'member',
-                                                                                         { popeq: { cached: true,
-                                                                                                    result: undefined } }]).value)),
+                                                                                                   result: undefined } }]).value),
                             'Membership already verified');
-    const tmp_2 = this._persistentHash_0(this._credential_0(context,
-                                                            partialProofData).secret);
     __compactRuntime.queryLedgerState(context,
                                       partialProofData,
                                       [
@@ -461,14 +659,14 @@ export class Contract {
                                                          value: { value: _descriptor_10.toValue(2n),
                                                                   alignment: _descriptor_10.alignment() } }] } },
                                        { push: { storage: false,
-                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(tmp_2),
+                                                 value: __compactRuntime.StateValue.newCell({ value: _descriptor_0.toValue(nullifier_0),
                                                                                               alignment: _descriptor_0.alignment() }).encode() } },
                                        { push: { storage: true,
                                                  value: __compactRuntime.StateValue.newCell({ value: _descriptor_1.toValue(true),
                                                                                               alignment: _descriptor_1.alignment() }).encode() } },
                                        { ins: { cached: false, n: 1 } },
                                        { ins: { cached: true, n: 1 } }]);
-    const tmp_3 = 1n;
+    const tmp_0 = 1n;
     __compactRuntime.queryLedgerState(context,
                                       partialProofData,
                                       [
@@ -479,7 +677,7 @@ export class Contract {
                                                          value: { value: _descriptor_10.toValue(3n),
                                                                   alignment: _descriptor_10.alignment() } }] } },
                                        { addi: { immediate: parseInt(__compactRuntime.valueToBigInt(
-                                                              { value: _descriptor_2.toValue(tmp_3),
+                                                              { value: _descriptor_2.toValue(tmp_0),
                                                                 alignment: _descriptor_2.alignment() }
                                                                 .value
                                                             )) } },
@@ -491,6 +689,10 @@ export class Contract {
     return true;
   }
   _equal_1(x0, y0) {
+    if (!x0.every((x, i) => y0[i] === x)) { return false; }
+    return true;
+  }
+  _equal_2(x0, y0) {
     if (!x0.every((x, i) => y0[i] === x)) { return false; }
     return true;
   }
@@ -751,6 +953,20 @@ export function ledger(stateOrChargedState) {
                                                                                  path: [
                                                                                         { tag: 'value',
                                                                                           value: { value: _descriptor_10.toValue(3n),
+                                                                                                   alignment: _descriptor_10.alignment() } }] } },
+                                                                        { popeq: { cached: true,
+                                                                                   result: undefined } }]).value);
+    },
+    get memberCount() {
+      return _descriptor_6.fromValue(__compactRuntime.queryLedgerState(context,
+                                                                       partialProofData,
+                                                                       [
+                                                                        { dup: { n: 0 } },
+                                                                        { idx: { cached: false,
+                                                                                 pushPath: false,
+                                                                                 path: [
+                                                                                        { tag: 'value',
+                                                                                          value: { value: _descriptor_10.toValue(4n),
                                                                                                    alignment: _descriptor_10.alignment() } }] } },
                                                                         { popeq: { cached: true,
                                                                                    result: undefined } }]).value);

@@ -27,6 +27,7 @@ describe('Compact Smart Contract Verification', () => {
     assert.match(content, /export ledger memberCommitments:\s*Map<Bytes<32>,\s*Boolean>;/, 'Must export ledger memberCommitments map');
     assert.match(content, /export ledger verifiedMembers:\s*Map<Bytes<32>,\s*Boolean>;/, 'Must export ledger verifiedMembers map');
     assert.match(content, /export ledger verificationCount:\s*Counter;/, 'Must export ledger verificationCount Counter');
+    assert.match(content, /export ledger memberCount:\s*Counter;/, 'Must export ledger memberCount Counter');
   });
 
   it('should declare local ZK witness functions for private state execution', () => {
@@ -38,6 +39,7 @@ describe('Compact Smart Contract Verification', () => {
     const content = fs.readFileSync(compactFilePath, 'utf-8');
     assert.match(content, /export circuit registerMembership\(commitment:\s*Bytes<32>\):\s*\[\]/, 'Must export circuit registerMembership');
     assert.match(content, /export circuit revokeMembership\(commitment:\s*Bytes<32>\):\s*\[\]/, 'Must export circuit revokeMembership');
+    assert.match(content, /export circuit transferAdmin\(newAdmin:\s*Bytes<32>\):\s*\[\]/, 'Must export circuit transferAdmin');
     assert.match(content, /export circuit verifyMembership\(\):\s*\[\]/, 'Must export circuit verifyMembership');
   });
 

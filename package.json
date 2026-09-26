@@ -6,13 +6,13 @@
   "author": "",
   "license": "MIT",
   "scripts": {
-    "compile": "compact compile contracts/anonymous-membership-organisation.compact contracts/managed/anonymous-membership-organisation",
+    "compile": "node scripts/compile.js",
     "build": "node node_modules/typescript/bin/tsc --noEmit",
-    "setup": "npx tsx src/setup.ts",
-    "deploy": "npx tsx src/deploy.ts",
-    "cli": "npx tsx src/cli.ts",
-    "check-balance": "npx tsx src/check-balance.ts",
-    "network": "npx tsx src/network.ts",
+    "setup": "node --experimental-strip-types src/setup.ts",
+    "deploy": "node --experimental-strip-types src/deploy.ts",
+    "cli": "node --experimental-strip-types src/cli.ts",
+    "check-balance": "node --experimental-strip-types src/check-balance.ts",
+    "network": "node --experimental-strip-types src/network.ts",
     "proof-server:start": "docker compose up -d",
     "proof-server:stop": "docker compose down",
     "clean": "rm -rf contracts/managed .midnight-state.json .midnight-wallet-state",
@@ -50,5 +50,8 @@
     "blockchain",
     "zero-knowledge",
     "privacy"
-  ]
+  ],
+  "overrides": {
+    "@midnight-ntwrk/ledger-v8": "8.1.2"
+  }
 }

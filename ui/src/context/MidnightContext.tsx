@@ -337,7 +337,7 @@ export function MidnightProvider({ children }: { children: ReactNode }) {
       
       let deployed: any;
       try {
-        deployed = await deployContract(providers, {
+        deployed = await deployContract(providers as any, {
           privateStateId: PRIVATE_STATE_ID,
           initialPrivateState: {},
           compiledContract: compiledContract as any,

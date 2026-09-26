@@ -15,8 +15,8 @@ import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
 import { NodeZkConfigProvider } from '@midnight-ntwrk/midnight-js-node-zk-config-provider';
-import { resolveNetwork, getOrCreateSeed, getDeployment } from './network';
-import { createWallet, persistWalletState, unshieldedToken, type WalletContext } from './wallet';
+import { resolveNetwork, getOrCreateSeed, getDeployment } from './network.ts';
+import { createWallet, persistWalletState, unshieldedToken, type WalletContext } from './wallet.ts';
 import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
 
 // Enable WebSocket for GraphQL subscriptions
@@ -146,9 +146,10 @@ async function main() {
       console.log('─── Menu ───────────────────────────────────────────────────────');
       console.log('  1. Register Membership (Admin)');
       console.log('  2. Revoke Membership (Admin)');
-      console.log('  3. Read public ledger state');
-      console.log('  4. Check wallet balance');
-      console.log('  5. Exit\n');
+      console.log('  3. Transfer Admin Authority (Admin)');
+      console.log('  4. Read public ledger state');
+      console.log('  5. Check wallet balance');
+      console.log('  6. Exit\n');
 
       const choice = await rl.question('  Your choice: ');
 
@@ -190,12 +191,31 @@ async function main() {
         }
 
         case '3': {
+          const newAdminHex = await rl.question('  Enter 32-byte new admin public key (hex without 0x): ');
+          if (newAdminHex.length !== 64) {
+            console.log('  ❌ Admin key must be 64 hex characters (32 bytes).');
+            break;
+          }
+          const newAdmin = new Uint8Array(Buffer.from(newAdminHex, 'hex'));
+          console.log('\n  Submitting transaction (this may take 30-60 seconds)...');
+          try {
+            const tx = await deployed.callTx.transferAdmin(newAdmin);
+            console.log(`\n  ✅ Admin authority transferred.`);
+            console.log(`  Transaction ID: ${tx.public.txId}`);
+          } catch (error) {
+            console.error('\n  ❌ Failed:', error instanceof Error ? error.message : error);
+          }
+          break;
+        }
+
+        case '4': {
           console.log('\n  Reading state from blockchain...');
           try {
             const contractState = await providers.publicDataProvider.queryContractState(deployment.address);
             if (contractState) {
               const ledgerState = Contract_Module.ledger(contractState.data);
-              console.log(`\n  📋 Total verifications: ${ledgerState.verificationCount.toString()}\n`);
+              console.log(`\n  📋 Total verifications: ${ledgerState.verificationCount.toString()}`);
+              console.log(`  📋 Active members:      ${ledgerState.memberCount?.toString() ?? '0'}\n`);
             } else {
               console.log('\n  📋 No state found\n');
             }
@@ -205,7 +225,7 @@ async function main() {
           break;
         }
 
-        case '4': {
+        case '5': {
           console.log('\n  Checking balance...');
           const currentState = await walletCtx.wallet.waitForSyncedState();
           const currentBalance = currentState.unshielded.balances[unshieldedToken().raw] ?? 0n;
@@ -215,13 +235,13 @@ async function main() {
           break;
         }
 
-        case '5':
+        case '6':
           running = false;
           console.log('\n  👋 Goodbye!\n');
           break;
 
         default:
-          console.log('\n  ❌ Invalid choice. Please enter 1-5.\n');
+          console.log('\n  ❌ Invalid choice. Please enter 1-6.\n');
       }
     }
 

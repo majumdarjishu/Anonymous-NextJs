@@ -6,8 +6,8 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { resolveNetwork, getOrCreateSeed, recordDeployment } from './network';
-import { createWallet, persistWalletState, unshieldedToken, type WalletContext } from './wallet';
+import { resolveNetwork, getOrCreateSeed, recordDeployment } from './network.ts';
+import { createWallet, persistWalletState, unshieldedToken, type WalletContext } from './wallet.ts';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { WebSocket } from 'ws';
 import * as Rx from 'rxjs';

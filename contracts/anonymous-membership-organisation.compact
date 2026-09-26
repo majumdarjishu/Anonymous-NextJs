@@ -6,6 +6,7 @@ export ledger admin: Bytes<32>;
 export ledger memberCommitments: Map<Bytes<32>, Boolean>; // true if active, false if revoked
 export ledger verifiedMembers: Map<Bytes<32>, Boolean>; // stores nullifiers to prevent double verification
 export ledger verificationCount: Counter;
+export ledger memberCount: Counter;
 
 constructor(adminKey: Bytes<32>) {
     admin = disclose(adminKey);
@@ -22,25 +23,49 @@ witness credential(): MembershipCredential;
 // Admin registers a member's commitment
 export circuit registerMembership(commitment: Bytes<32>): [] {
     assert(admin == disclose(ownPublicKey()).bytes, "Only admin can register members");
+    
+    // Check if commitment is already registered and currently active
+    const isRegistered = memberCommitments.member(disclose(commitment));
+    if (isRegistered) {
+        assert(!memberCommitments.lookup(disclose(commitment)), "Member already registered and active");
+    }
+    
     memberCommitments.insert(disclose(commitment), true);
+    memberCount.increment(1);
 }
 
 // Admin revokes a member's commitment
 export circuit revokeMembership(commitment: Bytes<32>): [] {
     assert(admin == disclose(ownPublicKey()).bytes, "Only admin can revoke members");
+    
+    // Member must exist in commitments map and currently be active
+    assert(memberCommitments.member(disclose(commitment)), "Member commitment not found");
+    assert(memberCommitments.lookup(disclose(commitment)), "Member is already revoked");
+    
     memberCommitments.insert(disclose(commitment), false);
+    memberCount.decrement(1);
+}
+
+// Admin transfers administrative authority to a new key
+export circuit transferAdmin(newAdmin: Bytes<32>): [] {
+    assert(admin == disclose(ownPublicKey()).bytes, "Only current admin can transfer administration");
+    admin = disclose(newAdmin);
 }
 
 // Any user can anonymously verify their membership using their private credential
 export circuit verifyMembership(): [] {
-    // Member must be registered
-    assert(memberCommitments.member(disclose(persistentHash<MembershipCredential>(credential()))), "Membership commitment not found");
+    const commitment = disclose(persistentHash<MembershipCredential>(credential()));
+    
+    // Member must be registered AND actively valid (not revoked)
+    assert(memberCommitments.member(commitment), "Membership commitment not found");
+    assert(memberCommitments.lookup(commitment), "Membership has been revoked");
     
     // Create a unique nullifier derived from the secret alone to avoid correlating with the commitment hash
     // Ensure this nullifier hasn't already verified
-    assert(!verifiedMembers.member(disclose(persistentHash<Bytes<32>>(credential().secret))), "Membership already verified");
+    const nullifier = disclose(persistentHash<Bytes<32>>(credential().secret));
+    assert(!verifiedMembers.member(nullifier), "Membership already verified");
     
     // Record verification and increment counter
-    verifiedMembers.insert(disclose(persistentHash<Bytes<32>>(credential().secret)), true);
+    verifiedMembers.insert(nullifier, true);
     verificationCount.increment(1);
 }

@@ -1,5 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import * as path from 'node:path';
 import {
   isNetworkId,
   parseNetworkFlag,
@@ -36,7 +37,7 @@ describe('Network & Wallet Resolution Utilities', () => {
   });
 
   it('should default to undeployed network when no flags or state files exist', () => {
-    const res = resolveNetwork({ argv: ['node', 'script.js'], cwd: process.cwd() });
+    const res = resolveNetwork({ argv: ['node', 'script.js'], cwd: path.join(process.cwd(), 'test') });
     assert.equal(res.network, 'undeployed');
     assert.equal(res.config.proofServer, 'http://127.0.0.1:6300');
   });

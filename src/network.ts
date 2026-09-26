@@ -303,11 +303,3 @@ function cliMain(argv: string[]): number {
   return 0;
 }
 
-if (isMain()) {
-  try {
-    process.exit(cliMain(process.argv));
-  } catch (e) {
-    process.stderr.write(`${(e as Error).message}\n`);
-    process.exit(1);
-  }
-}

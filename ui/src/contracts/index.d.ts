@@ -11,6 +11,8 @@ export type ImpureCircuits<PS> = {
                      commitment_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   revokeMembership(context: __compactRuntime.CircuitContext<PS>,
                    commitment_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
+  transferAdmin(context: __compactRuntime.CircuitContext<PS>,
+                newAdmin_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   verifyMembership(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
 }
 
@@ -19,6 +21,8 @@ export type ProvableCircuits<PS> = {
                      commitment_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   revokeMembership(context: __compactRuntime.CircuitContext<PS>,
                    commitment_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
+  transferAdmin(context: __compactRuntime.CircuitContext<PS>,
+                newAdmin_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   verifyMembership(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
 }
 
@@ -30,6 +34,8 @@ export type Circuits<PS> = {
                      commitment_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   revokeMembership(context: __compactRuntime.CircuitContext<PS>,
                    commitment_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
+  transferAdmin(context: __compactRuntime.CircuitContext<PS>,
+                newAdmin_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
   verifyMembership(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
 }
 
@@ -50,6 +56,7 @@ export type Ledger = {
     [Symbol.iterator](): Iterator<[Uint8Array, boolean]>
   };
   readonly verificationCount: bigint;
+  readonly memberCount: bigint;
 }
 
 export type ContractReferenceLocations = any;

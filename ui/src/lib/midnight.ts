@@ -207,8 +207,8 @@ export const createMidnightProviders = async (
   const walletProvider = {
     coinPublicKey,
     encryptionPublicKey,
-    getCoinPublicKey: () => toHex(coinPublicKey),
-    getEncryptionPublicKey: () => toHex(encryptionPublicKey),
+    getCoinPublicKey: () => coinPublicKey,
+    getEncryptionPublicKey: () => encryptionPublicKey,
     balanceTx: async (tx: any, _newCoins: any): Promise<any> => {
       console.log('[Midnight] Preparing transaction...');
       const txHex = toHex(tx.serialize());
@@ -230,7 +230,11 @@ export const createMidnightProviders = async (
       await walletApi.submitTransaction(txHex);
       console.log('[1AM] Wallet confirmed transaction submission!');
       
-      // Since it returns void, we MUST extract the hash from the transaction object itself
+      // Extract hash from Midnight ProvenTransaction
+      if (typeof tx === 'object' && tx.public && typeof tx.public.txId === 'string') {
+        console.log(`[Midnight] Extracted transaction hash: ${tx.public.txId}`);
+        return tx.public.txId;
+      }
       if (typeof tx === 'object' && typeof tx.transactionHash === 'function') {
         const hash = tx.transactionHash();
         console.log(`[Midnight] Extracted transaction hash: ${hash}`);

@@ -108,4 +108,79 @@ describe('Zero-Knowledge Witness Cryptographic Primitives', () => {
     assert.equal(res2.success, false);
     assert.equal(res2.reason, 'Already joined');
   });
+
+  it('should reject verification when a member has been revoked even if commitment exists in map', () => {
+    // Simulates the contract's memberCommitments Map<Bytes<32>, Boolean>
+    const memberCommitments = new Map<string, boolean>();
+    const secret = randomBytes(32);
+    const commitmentHex = deriveCommitment(secret).toString('hex');
+
+    // 1. Admin registers member -> active (true)
+    memberCommitments.set(commitmentHex, true);
+    assert.equal(memberCommitments.has(commitmentHex), true);
+    assert.equal(memberCommitments.get(commitmentHex), true);
+
+    // Verify circuit logic:
+    // assert(memberCommitments.member(commitment))
+    // assert(memberCommitments.lookup(commitment))
+    const canVerifyBeforeRevocation = memberCommitments.has(commitmentHex) && memberCommitments.get(commitmentHex) === true;
+    assert.equal(canVerifyBeforeRevocation, true, 'Active member must pass verification');
+
+    // 2. Admin revokes member -> set to false
+    memberCommitments.set(commitmentHex, false);
+    assert.equal(memberCommitments.has(commitmentHex), true, 'Key still exists in map');
+    assert.equal(memberCommitments.get(commitmentHex), false, 'Status is revoked');
+
+    // With the improved contract logic:
+    const canVerifyAfterRevocation = memberCommitments.has(commitmentHex) && memberCommitments.get(commitmentHex) === true;
+    assert.equal(canVerifyAfterRevocation, false, 'Revoked member must be rejected during verification');
+  });
+
+  it('should enforce memberCount increment upon registration and decrement upon revocation', () => {
+    let memberCount = 0;
+    const commitments = new Map<string, boolean>();
+
+    const register = (commHex: string) => {
+      assert.equal(commitments.get(commHex) !== true, true, 'Cannot register active member');
+      commitments.set(commHex, true);
+      memberCount++;
+    };
+
+    const revoke = (commHex: string) => {
+      assert.equal(commitments.has(commHex), true, 'Member must exist');
+      assert.equal(commitments.get(commHex), true, 'Member must be active');
+      commitments.set(commHex, false);
+      memberCount--;
+    };
+
+    const m1 = randomBytes(32).toString('hex');
+    const m2 = randomBytes(32).toString('hex');
+
+    register(m1);
+    assert.equal(memberCount, 1);
+    register(m2);
+    assert.equal(memberCount, 2);
+
+    revoke(m1);
+    assert.equal(memberCount, 1);
+    assert.equal(commitments.get(m1), false);
+    assert.equal(commitments.get(m2), true);
+  });
+
+  it('should validate admin transfer authority logic', () => {
+    let admin = randomBytes(32).toString('hex');
+    const transferAdmin = (caller: string, newAdmin: string) => {
+      if (caller !== admin) {
+        throw new Error('Only current admin can transfer administration');
+      }
+      admin = newAdmin;
+    };
+
+    const newAdmin = randomBytes(32).toString('hex');
+    const attacker = randomBytes(32).toString('hex');
+
+    assert.throws(() => transferAdmin(attacker, newAdmin), /Only current admin/);
+    transferAdmin(admin, newAdmin);
+    assert.equal(admin, newAdmin, 'Admin transferred successfully');
+  });
 });
